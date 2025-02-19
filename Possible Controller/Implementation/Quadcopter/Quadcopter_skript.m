@@ -1,5 +1,5 @@
 % Masse des Quadcopters 0.5 bis 2kg
-m = 1;
+m = 0.965;
 
 % Trägheitsmomente des Quadcopters
 I_xx = 0.01;
