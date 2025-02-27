@@ -1,0 +1,5 @@
+# ninja log v5
+5	149	7623878990693717	CMakeFiles/UAV_objects.dir/UAV_data.cpp.obj	3d15829e042e799b
+9	187	7623878991186696	CMakeFiles/UAV.dir/C_/Program_Files/MATLAB/R2024b/rtw/c/src/common/rt_cppclass_main.cpp.obj	d1f2600c6aac6e2f
+1	194	7623878991321770	CMakeFiles/UAV_objects.dir/UAV.cpp.obj	8cd054e199e2d903
+194	296	7623878991991909	UAV.exe	f9dcbdacec3e0dbd

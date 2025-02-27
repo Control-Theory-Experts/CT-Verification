@@ -3,9 +3,9 @@ angle_change_start_time = 1;
 initial_angle = 0;
 final_angle = 1;
 epsilon = 0.01;
-Kp = 10.7142;
+Kp = 30.7142;
 Ki = 2.480;
-Kd = 0.92844;
+Kd = 1.10844;
 
 simOut = sim('UAV');
 
