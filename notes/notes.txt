@@ -1,5 +1,0 @@
-
-
-Chapter 1 - (Lookup a controller get used to Simulink) 23.01.2025
-
--https://www.researchgate.net/publication/352909919_Design_and_Development_of_closed_loop_PID_controller_in_MATLAB_SIMULINK_to_control_the_pitch_angle_of_tail_plane
