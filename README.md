@@ -34,3 +34,7 @@
 ## Chapter 7 - Get started with Divine Model Checker (19.03.2025)
 - Download of Divine
 - Get to know the functionality
+
+## Chapter 8 - Main Methode für den cpp-Code
+- 
+-
