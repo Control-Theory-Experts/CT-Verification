@@ -31,6 +31,6 @@
 ## Chapter 6 - Code Analysis (26.02.2025)
 - Understanding the generated C++ code and its structure.
 
-
-Path divine:
-Sebastian: /mnt/c/Users/sebas/Downloads
+## Chapter 7 - Get started with Divine Model Checker (19.03.2025)
+- Download of Divine
+- Get to know the methods
