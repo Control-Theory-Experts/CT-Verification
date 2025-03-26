@@ -31,3 +31,6 @@
 ## Chapter 6 - Code Analysis (26.02.2025)
 - Understanding the generated C++ code and its structure.
 
+
+Path divine:
+Sebastian: /mnt/c/Users/sebas/Downloads
