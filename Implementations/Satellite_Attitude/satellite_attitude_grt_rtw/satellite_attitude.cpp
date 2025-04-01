@@ -7,9 +7,9 @@
  *
  * Code generation for model "satellite_attitude".
  *
- * Model version              : 1.12
+ * Model version              : 1.13
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Tue Mar 18 20:02:36 2025
+ * C++ source code generated on : Tue Apr  1 15:44:16 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -128,25 +128,19 @@ void satellite_attitude::step()
       ->solverInfo);
   }
 
+  /* TransferFcn: '<Root>/Actuator' */
+  satellite_attitude_B.actuatorForce = 78.3 * satellite_attitude_X.Actuator[0];
+
   /* TransferFcn: '<Root>/Satellite structure (Plant)' */
-  rtb_errorDesiredActualAttitude =
-    satellite_attitude_P.SatellitestructurePlant_C[0] *
-    satellite_attitude_X.Satellite_structure[0] +
-    satellite_attitude_P.SatellitestructurePlant_C[1] *
+  rtb_errorDesiredActualAttitude = 0.0 *
+    satellite_attitude_X.Satellite_structure[0] + 1.25 *
     satellite_attitude_X.Satellite_structure[1];
+
+  /* TransferFcn: '<Root>/Actuator' */
+  satellite_attitude_B.actuatorForce += 0.0 * satellite_attitude_X.Actuator[1];
 
   /* Outport: '<Root>/ActualAttitude' */
   satellite_attitude_Y.ActualAttitude = rtb_errorDesiredActualAttitude;
-
-  /* TransferFcn: '<Root>/Actuator' */
-  satellite_attitude_B.actuatorForce = satellite_attitude_P.Actuator_C[0] *
-    satellite_attitude_X.Actuator[0];
-  satellite_attitude_B.actuatorForce += satellite_attitude_P.Actuator_C[1] *
-    satellite_attitude_X.Actuator[1];
-
-  /* TransferFcn: '<Root>/Amplifier' */
-  satellite_attitude_B.amplifiedSignal = satellite_attitude_P.Amplifier_C *
-    satellite_attitude_X.Amplifier;
 
   /* Sum: '<Root>/Sum' incorporates:
    *  Inport: '<Root>/DesiredAttitude'
@@ -154,26 +148,27 @@ void satellite_attitude::step()
   rtb_errorDesiredActualAttitude = satellite_attitude_U.desiredAttitude -
     rtb_errorDesiredActualAttitude;
 
-  /* Gain: '<S33>/Integral Gain' */
-  satellite_attitude_B.IntegralGain = satellite_attitude_P.PIDController_I *
-    rtb_errorDesiredActualAttitude;
-
   /* Gain: '<S39>/Filter Coefficient' incorporates:
    *  Gain: '<S29>/Derivative Gain'
    *  Integrator: '<S31>/Filter'
    *  Sum: '<S31>/SumD'
    */
-  satellite_attitude_B.FilterCoefficient = (satellite_attitude_P.PIDController_D
-    * rtb_errorDesiredActualAttitude - satellite_attitude_X.Filter_CSTATE) *
-    satellite_attitude_P.PIDController_N;
+  satellite_attitude_B.FilterCoefficient = (1.98 *
+    rtb_errorDesiredActualAttitude - satellite_attitude_X.Filter_CSTATE) * 100.0;
 
   /* Sum: '<S45>/Sum' incorporates:
    *  Gain: '<S41>/Proportional Gain'
    *  Integrator: '<S36>/Integrator'
    */
-  satellite_attitude_B.Sum = (satellite_attitude_P.PIDController_P *
-    rtb_errorDesiredActualAttitude + satellite_attitude_X.Integrator_CSTATE) +
+  satellite_attitude_B.Sum = (9.0 * rtb_errorDesiredActualAttitude +
+    satellite_attitude_X.Integrator_CSTATE) +
     satellite_attitude_B.FilterCoefficient;
+
+  /* Gain: '<S33>/Integral Gain' */
+  satellite_attitude_B.IntegralGain = 0.0564 * rtb_errorDesiredActualAttitude;
+
+  /* TransferFcn: '<Root>/Amplifier' */
+  satellite_attitude_B.amplifiedSignal = 2400.0 * satellite_attitude_X.Amplifier;
   if (rtmIsMajorTimeStep((&satellite_attitude_M))) {
     /* Matfile logging */
     rt_UpdateTXYLogVars((&satellite_attitude_M)->rtwLogInfo,
@@ -217,34 +212,37 @@ void satellite_attitude::satellite_attitude_derivatives()
   XDot_satellite_attitude_T *_rtXdot;
   _rtXdot = ((XDot_satellite_attitude_T *) (&satellite_attitude_M)->derivs);
 
-  /* Derivatives for TransferFcn: '<Root>/Satellite structure (Plant)' */
-  _rtXdot->Satellite_structure[0] =
-    satellite_attitude_P.SatellitestructurePlant_A[0] *
-    satellite_attitude_X.Satellite_structure[0];
-  _rtXdot->Satellite_structure[0] +=
-    satellite_attitude_P.SatellitestructurePlant_A[1] *
-    satellite_attitude_X.Satellite_structure[1];
-  _rtXdot->Satellite_structure[1] = satellite_attitude_X.Satellite_structure[0];
-  _rtXdot->Satellite_structure[0] += satellite_attitude_B.actuatorForce;
-
-  /* Derivatives for TransferFcn: '<Root>/Actuator' */
-  _rtXdot->Actuator[0] = satellite_attitude_P.Actuator_A[0] *
-    satellite_attitude_X.Actuator[0];
-  _rtXdot->Actuator[0] += satellite_attitude_P.Actuator_A[1] *
-    satellite_attitude_X.Actuator[1];
-  _rtXdot->Actuator[1] = satellite_attitude_X.Actuator[0];
-  _rtXdot->Actuator[0] += satellite_attitude_B.amplifiedSignal;
-
-  /* Derivatives for TransferFcn: '<Root>/Amplifier' */
-  _rtXdot->Amplifier = satellite_attitude_P.Amplifier_A *
-    satellite_attitude_X.Amplifier;
-  _rtXdot->Amplifier += satellite_attitude_B.Sum;
-
   /* Derivatives for Integrator: '<S31>/Filter' */
   _rtXdot->Filter_CSTATE = satellite_attitude_B.FilterCoefficient;
 
   /* Derivatives for Integrator: '<S36>/Integrator' */
   _rtXdot->Integrator_CSTATE = satellite_attitude_B.IntegralGain;
+
+  /* Derivatives for TransferFcn: '<Root>/Satellite structure (Plant)' */
+  _rtXdot->Satellite_structure[0] = -0.0 *
+    satellite_attitude_X.Satellite_structure[0];
+
+  /* Derivatives for TransferFcn: '<Root>/Actuator' */
+  _rtXdot->Actuator[0] = -1815.4 * satellite_attitude_X.Actuator[0];
+
+  /* Derivatives for TransferFcn: '<Root>/Satellite structure (Plant)' */
+  _rtXdot->Satellite_structure[0] += -0.0 *
+    satellite_attitude_X.Satellite_structure[1];
+
+  /* Derivatives for TransferFcn: '<Root>/Actuator' */
+  _rtXdot->Actuator[0] += -24466.0 * satellite_attitude_X.Actuator[1];
+
+  /* Derivatives for TransferFcn: '<Root>/Satellite structure (Plant)' */
+  _rtXdot->Satellite_structure[1] = satellite_attitude_X.Satellite_structure[0];
+  _rtXdot->Satellite_structure[0] += satellite_attitude_B.actuatorForce;
+
+  /* Derivatives for TransferFcn: '<Root>/Actuator' */
+  _rtXdot->Actuator[1] = satellite_attitude_X.Actuator[0];
+  _rtXdot->Actuator[0] += satellite_attitude_B.amplifiedSignal;
+
+  /* Derivatives for TransferFcn: '<Root>/Amplifier' */
+  _rtXdot->Amplifier = -10.0 * satellite_attitude_X.Amplifier;
+  _rtXdot->Amplifier += satellite_attitude_B.Sum;
 }
 
 /* Model initialize function */
@@ -418,6 +416,12 @@ void satellite_attitude::initialize()
     rtmGetTFinal((&satellite_attitude_M)), (&satellite_attitude_M)
     ->Timing.stepSize0, (&rtmGetErrorStatus((&satellite_attitude_M))));
 
+  /* InitializeConditions for Integrator: '<S31>/Filter' */
+  satellite_attitude_X.Filter_CSTATE = 0.0;
+
+  /* InitializeConditions for Integrator: '<S36>/Integrator' */
+  satellite_attitude_X.Integrator_CSTATE = 0.0;
+
   /* InitializeConditions for TransferFcn: '<Root>/Satellite structure (Plant)' */
   satellite_attitude_X.Satellite_structure[0] = 0.0;
 
@@ -432,14 +436,6 @@ void satellite_attitude::initialize()
 
   /* InitializeConditions for TransferFcn: '<Root>/Amplifier' */
   satellite_attitude_X.Amplifier = 0.0;
-
-  /* InitializeConditions for Integrator: '<S31>/Filter' */
-  satellite_attitude_X.Filter_CSTATE =
-    satellite_attitude_P.PIDController_InitialConditionF;
-
-  /* InitializeConditions for Integrator: '<S36>/Integrator' */
-  satellite_attitude_X.Integrator_CSTATE =
-    satellite_attitude_P.PIDController_InitialConditio_e;
 }
 
 /* Model terminate function */

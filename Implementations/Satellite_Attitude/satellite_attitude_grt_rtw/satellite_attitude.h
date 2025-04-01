@@ -7,9 +7,9 @@
  *
  * Code generation for model "satellite_attitude".
  *
- * Model version              : 1.12
+ * Model version              : 1.13
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Tue Mar 18 20:02:36 2025
+ * C++ source code generated on : Tue Apr  1 15:44:16 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -165,38 +165,38 @@
 
 /* Block signals (default storage) */
 struct B_satellite_attitude_T {
-  real_T actuatorForce;                /* '<Root>/Actuator' */
-  real_T amplifiedSignal;              /* '<Root>/Amplifier' */
-  real_T IntegralGain;                 /* '<S33>/Integral Gain' */
   real_T FilterCoefficient;            /* '<S39>/Filter Coefficient' */
   real_T Sum;                          /* '<S45>/Sum' */
+  real_T IntegralGain;                 /* '<S33>/Integral Gain' */
+  real_T actuatorForce;                /* '<Root>/Actuator' */
+  real_T amplifiedSignal;              /* '<Root>/Amplifier' */
 };
 
 /* Continuous states (default storage) */
 struct X_satellite_attitude_T {
   real_T Satellite_structure[2];      /* '<Root>/Satellite structure (Plant)' */
-  real_T Actuator[2];                  /* '<Root>/Actuator' */
-  real_T Amplifier;                    /* '<Root>/Amplifier' */
   real_T Filter_CSTATE;                /* '<S31>/Filter' */
   real_T Integrator_CSTATE;            /* '<S36>/Integrator' */
+  real_T Actuator[2];                  /* '<Root>/Actuator' */
+  real_T Amplifier;                    /* '<Root>/Amplifier' */
 };
 
 /* State derivatives (default storage) */
 struct XDot_satellite_attitude_T {
   real_T Satellite_structure[2];      /* '<Root>/Satellite structure (Plant)' */
-  real_T Actuator[2];                  /* '<Root>/Actuator' */
-  real_T Amplifier;                    /* '<Root>/Amplifier' */
   real_T Filter_CSTATE;                /* '<S31>/Filter' */
   real_T Integrator_CSTATE;            /* '<S36>/Integrator' */
+  real_T Actuator[2];                  /* '<Root>/Actuator' */
+  real_T Amplifier;                    /* '<Root>/Amplifier' */
 };
 
 /* State disabled  */
 struct XDis_satellite_attitude_T {
   boolean_T Satellite_structure[2];   /* '<Root>/Satellite structure (Plant)' */
-  boolean_T Actuator[2];               /* '<Root>/Actuator' */
-  boolean_T Amplifier;                 /* '<Root>/Amplifier' */
   boolean_T Filter_CSTATE;             /* '<S31>/Filter' */
   boolean_T Integrator_CSTATE;         /* '<S36>/Integrator' */
+  boolean_T Actuator[2];               /* '<Root>/Actuator' */
+  boolean_T Amplifier;                 /* '<Root>/Amplifier' */
 };
 
 #ifndef ODE4_INTG
@@ -218,50 +218,6 @@ struct ExtU_satellite_attitude_T {
 /* External outputs (root outports fed by signals with default storage) */
 struct ExtY_satellite_attitude_T {
   real_T ActualAttitude;               /* '<Root>/ActualAttitude' */
-};
-
-/* Parameters (default storage) */
-struct P_satellite_attitude_T_ {
-  real_T PIDController_D;              /* Mask Parameter: PIDController_D
-                                        * Referenced by: '<S29>/Derivative Gain'
-                                        */
-  real_T PIDController_I;              /* Mask Parameter: PIDController_I
-                                        * Referenced by: '<S33>/Integral Gain'
-                                        */
-  real_T PIDController_InitialConditionF;
-                              /* Mask Parameter: PIDController_InitialConditionF
-                               * Referenced by: '<S31>/Filter'
-                               */
-  real_T PIDController_InitialConditio_e;
-                              /* Mask Parameter: PIDController_InitialConditio_e
-                               * Referenced by: '<S36>/Integrator'
-                               */
-  real_T PIDController_N;              /* Mask Parameter: PIDController_N
-                                        * Referenced by: '<S39>/Filter Coefficient'
-                                        */
-  real_T PIDController_P;              /* Mask Parameter: PIDController_P
-                                        * Referenced by: '<S41>/Proportional Gain'
-                                        */
-  real_T SatellitestructurePlant_A[2];
-                                /* Computed Parameter: SatellitestructurePlant_A
-                                 * Referenced by: '<Root>/Satellite structure (Plant)'
-                                 */
-  real_T SatellitestructurePlant_C[2];
-                                /* Computed Parameter: SatellitestructurePlant_C
-                                 * Referenced by: '<Root>/Satellite structure (Plant)'
-                                 */
-  real_T Actuator_A[2];                /* Computed Parameter: Actuator_A
-                                        * Referenced by: '<Root>/Actuator'
-                                        */
-  real_T Actuator_C[2];                /* Computed Parameter: Actuator_C
-                                        * Referenced by: '<Root>/Actuator'
-                                        */
-  real_T Amplifier_A;                  /* Computed Parameter: Amplifier_A
-                                        * Referenced by: '<Root>/Amplifier'
-                                        */
-  real_T Amplifier_C;                  /* Computed Parameter: Amplifier_C
-                                        * Referenced by: '<Root>/Amplifier'
-                                        */
 };
 
 /* Real-time Model Data Structure */
@@ -369,9 +325,6 @@ class satellite_attitude final
 
   /* Block signals */
   B_satellite_attitude_T satellite_attitude_B;
-
-  /* Tunable parameters */
-  static P_satellite_attitude_T satellite_attitude_P;
 
   /* Block continuous states */
   X_satellite_attitude_T satellite_attitude_X;

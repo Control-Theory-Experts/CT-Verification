@@ -1,15 +1,20 @@
+set CMAKE_EXPORT_COMPILE_COMMANDS=TRUE
+set PATH=C:\ProgramData\MATLAB\SupportPackages\R2024b\3P.instrset\mingw_w64.instrset\bin;C:\Program Files\MATLAB\R2024b/toolbox/shared/coder/ninja/win64;%PATH%
+"C:\Program Files\MATLAB\R2024b\bin\win64\cmake\bin\cmake.exe" -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE="C:\Program Files\MATLAB\R2024b/toolbox/coder/compile/cmake/windows_mingw_toolchain.cmake" -DENABLE_SSE2=1 -D CMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=".." --no-warn-unused-cli
+@if errorlevel 1 (
+    @echo The cmake command returned an error of %errorlevel% 1>&2
+    @exit /B 1
+)
 
-call "setup_mingw.bat"
+"C:\Program Files\MATLAB\R2024b\bin\win64\cmake\bin\cmake.exe" --build build build.bat
+@if errorlevel 1 (
+    @echo The cmake command returned an error of %errorlevel% 1>&2
+    @exit /B 1
+)
 
-cd .
+"C:\Program Files\MATLAB\R2024b\bin\win64\cmake\bin\cmake.exe" --install build --prefix ..
+@if errorlevel 1 (
+    @echo The cmake command returned an error of %errorlevel% 1>&2
+    @exit /B 1
+)
 
-chcp 1252
-
-if "%1"=="" ("%MINGW_ROOT%\mingw32-make.exe"  -j 4 -l 4 -Oline -f satellite_attitude.mk all) else ("%MINGW_ROOT%\mingw32-make.exe"  -j 4 -l 4 -Oline -f satellite_attitude.mk %1)
-@if errorlevel 1 goto error_exit
-
-exit /B 0
-
-:error_exit
-echo The make command returned an error of %errorlevel%
-exit /B 1

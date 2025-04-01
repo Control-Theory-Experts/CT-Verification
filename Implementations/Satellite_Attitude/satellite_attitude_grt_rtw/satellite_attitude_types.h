@@ -7,9 +7,9 @@
  *
  * Code generation for model "satellite_attitude".
  *
- * Model version              : 1.12
+ * Model version              : 1.13
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Tue Mar 18 20:02:36 2025
+ * C++ source code generated on : Tue Apr  1 15:44:16 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -20,9 +20,6 @@
 
 #ifndef satellite_attitude_types_h_
 #define satellite_attitude_types_h_
-
-/* Parameters (default storage) */
-typedef struct P_satellite_attitude_T_ P_satellite_attitude_T;
 
 /* Forward declaration for rtModel */
 typedef struct tag_RTM_satellite_attitude_T RT_MODEL_satellite_attitude_T;
