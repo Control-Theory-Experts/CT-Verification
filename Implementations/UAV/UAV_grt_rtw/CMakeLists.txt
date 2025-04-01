@@ -50,7 +50,7 @@ set(UAV_COMMON_DEFINES -DMODEL=UAV
     -DCLASSIC_INTERFACE=0
     -DALLOCATIONFCN=0
     -DTID01EQ=1
-    -DMAT_FILE=0
+    -DMAT_FILE=1
     -DONESTEPFCN=1
     -DTERMFCN=1
     -DMULTI_INSTANCE_CODE=1
@@ -58,8 +58,10 @@ set(UAV_COMMON_DEFINES -DMODEL=UAV
     -DMT=0)
 
 # Definition of target "UAV_objects".
-add_library(UAV_objects OBJECT ${START_DIR}/UAV_grt_rtw/UAV.cpp
-    ${START_DIR}/UAV_grt_rtw/UAV_data.cpp)
+add_library(UAV_objects OBJECT ${MATLAB_ROOT}/rtw/c/src/rt_logging.c
+    ${START_DIR}/UAV_grt_rtw/UAV.cpp
+    ${START_DIR}/UAV_grt_rtw/UAV_data.cpp
+    ${START_DIR}/UAV_grt_rtw/rt_nonfinite.cpp)
 
 # Set properties for target "UAV_objects".
 set_target_properties(UAV_objects PROPERTIES PREFIX ""

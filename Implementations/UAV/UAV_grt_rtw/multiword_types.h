@@ -7,9 +7,9 @@
  *
  * Code generation for model "UAV".
  *
- * Model version              : 1.7
+ * Model version              : 1.11
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Thu Feb 27 20:31:25 2025
+ * C++ source code generated on : Mon Mar 31 17:31:06 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -21,6 +21,12 @@
 #ifndef MULTIWORD_TYPES_H
 #define MULTIWORD_TYPES_H
 #include "rtwtypes.h"
+
+/*
+ * Definitions supporting external data access
+ */
+typedef int32_T chunk_T;
+typedef uint32_T uchunk_T;
 
 /*
  * MultiWord supporting definitions

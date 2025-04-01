@@ -7,9 +7,9 @@
  *
  * Code generation for model "UAV".
  *
- * Model version              : 1.7
+ * Model version              : 1.11
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Thu Feb 27 20:31:25 2025
+ * C++ source code generated on : Mon Mar 31 17:31:06 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -134,6 +134,23 @@ void UAV::step()
     (&UAV_M)->Timing.t[0] = rtsiGetT(&(&UAV_M)->solverInfo);
   }
 
+  /* TransferFcn: '<Root>/Transfer Fcn' */
+  UAV_B.Ys = 0.0;
+  UAV_B.Ys += UAV_P.TransferFcn_C[0] * UAV_X.TransferFcn_CSTATE[0];
+  UAV_B.Ys += UAV_P.TransferFcn_C[1] * UAV_X.TransferFcn_CSTATE[1];
+  UAV_B.Ys += UAV_P.TransferFcn_C[2] * UAV_X.TransferFcn_CSTATE[2];
+  if (rtmIsMajorTimeStep((&UAV_M))) {
+    /* Scope: '<Root>/Scope' */
+    if (rtmIsMajorTimeStep((&UAV_M))) {
+      real_T u[2];
+      u[0] = ((((&UAV_M)->Timing.clockTick1+(&UAV_M)->Timing.clockTickH1*
+                4294967296.0)) * 0.0001)
+        ;
+      u[1] = UAV_B.Ys;
+      rt_UpdateLogVar((LogVar *)UAV_DW.Scope_PWORK.LoggedData, u, 0);
+    }
+  }
+
   /* Step: '<Root>/Step' */
   if ((&UAV_M)->Timing.t[0] < UAV_P.angle_change_start_time) {
     rtb_s = UAV_P.initial_angle;
@@ -143,11 +160,8 @@ void UAV::step()
 
   /* Sum: '<Root>/Sum' incorporates:
    *  Step: '<Root>/Step'
-   *  TransferFcn: '<Root>/Transfer Fcn'
    */
-  rtb_s -= (UAV_P.TransferFcn_C[0] * UAV_X.TransferFcn_CSTATE[0] +
-            UAV_P.TransferFcn_C[1] * UAV_X.TransferFcn_CSTATE[1]) +
-    UAV_P.TransferFcn_C[2] * UAV_X.TransferFcn_CSTATE[2];
+  rtb_s -= UAV_B.Ys;
 
   /* Gain: '<S33>/Integral Gain' */
   UAV_B.IntegralGain = UAV_P.Ki * rtb_s;
@@ -167,6 +181,22 @@ void UAV::step()
   UAV_B.Sum = (UAV_P.Kp * rtb_s + UAV_X.Integrator_CSTATE) +
     UAV_B.FilterCoefficient;
   if (rtmIsMajorTimeStep((&UAV_M))) {
+    /* Matfile logging */
+    rt_UpdateTXYLogVars((&UAV_M)->rtwLogInfo, ((&UAV_M)->Timing.t));
+  }                                    /* end MajorTimeStep */
+
+  if (rtmIsMajorTimeStep((&UAV_M))) {
+    /* signal main to stop simulation */
+    {                                  /* Sample time: [0.0s, 0.0s] */
+      if ((rtmGetTFinal((&UAV_M))!=-1) &&
+          !((rtmGetTFinal((&UAV_M))-((((&UAV_M)->Timing.clockTick1+(&UAV_M)
+               ->Timing.clockTickH1* 4294967296.0)) * 0.0001)) > ((((&UAV_M)
+              ->Timing.clockTick1+(&UAV_M)->Timing.clockTickH1* 4294967296.0)) *
+            0.0001) * (DBL_EPSILON))) {
+        rtmSetErrorStatus((&UAV_M), "Simulation finished");
+      }
+    }
+
     rt_ertODEUpdateContinuousStates(&(&UAV_M)->solverInfo);
 
     /* Update absolute time for base rate */
@@ -266,7 +296,63 @@ void UAV::initialize()
     ->intgData));
   rtsiSetSolverName(&(&UAV_M)->solverInfo,"ode3");
   rtmSetTPtr((&UAV_M), &(&UAV_M)->Timing.tArray[0]);
+  rtmSetTFinal((&UAV_M), 2.0);
   (&UAV_M)->Timing.stepSize0 = 0.0001;
+
+  /* Setup for data logging */
+  {
+    static RTWLogInfo rt_DataLoggingInfo;
+    rt_DataLoggingInfo.loggingInterval = (nullptr);
+    (&UAV_M)->rtwLogInfo = &rt_DataLoggingInfo;
+  }
+
+  /* Setup for data logging */
+  {
+    rtliSetLogXSignalInfo((&UAV_M)->rtwLogInfo, (nullptr));
+    rtliSetLogXSignalPtrs((&UAV_M)->rtwLogInfo, (nullptr));
+    rtliSetLogT((&UAV_M)->rtwLogInfo, "tout");
+    rtliSetLogX((&UAV_M)->rtwLogInfo, "");
+    rtliSetLogXFinal((&UAV_M)->rtwLogInfo, "");
+    rtliSetLogVarNameModifier((&UAV_M)->rtwLogInfo, "rt_");
+    rtliSetLogFormat((&UAV_M)->rtwLogInfo, 4);
+    rtliSetLogMaxRows((&UAV_M)->rtwLogInfo, 0);
+    rtliSetLogDecimation((&UAV_M)->rtwLogInfo, 1);
+    rtliSetLogY((&UAV_M)->rtwLogInfo, "");
+    rtliSetLogYSignalInfo((&UAV_M)->rtwLogInfo, (nullptr));
+    rtliSetLogYSignalPtrs((&UAV_M)->rtwLogInfo, (nullptr));
+  }
+
+  /* Matfile logging */
+  rt_StartDataLoggingWithStartTime((&UAV_M)->rtwLogInfo, 0.0, rtmGetTFinal
+    ((&UAV_M)), (&UAV_M)->Timing.stepSize0, (&rtmGetErrorStatus((&UAV_M))));
+
+  /* SetupRuntimeResources for Scope: '<Root>/Scope' */
+  {
+    int_T numCols = 2;
+    UAV_DW.Scope_PWORK.LoggedData = rt_CreateLogVar(
+      (&UAV_M)->rtwLogInfo,
+      0.0,
+      rtmGetTFinal((&UAV_M)),
+      (&UAV_M)->Timing.stepSize0,
+      (&rtmGetErrorStatus((&UAV_M))),
+      "yout",
+      SS_DOUBLE,
+      0,
+      0,
+      0,
+      2,
+      1,
+      (int_T *)&numCols,
+      NO_LOGVALDIMS,
+      (nullptr),
+      (nullptr),
+      0,
+      1,
+      0.0001,
+      1);
+    if (UAV_DW.Scope_PWORK.LoggedData == (nullptr))
+      return;
+  }
 
   /* InitializeConditions for TransferFcn: '<Root>/Transfer Fcn' */
   UAV_X.TransferFcn_CSTATE[0] = 0.0;
@@ -289,6 +375,7 @@ void UAV::terminate()
 /* Constructor */
 UAV::UAV() :
   UAV_B(),
+  UAV_DW(),
   UAV_X(),
   UAV_XDis(),
   UAV_M()

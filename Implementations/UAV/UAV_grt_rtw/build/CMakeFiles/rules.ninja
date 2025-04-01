@@ -12,6 +12,16 @@
 # =============================================================================
 
 #############################################
+# Rule for compiling C files.
+
+rule C_COMPILER__UAV_objects_Release
+  depfile = $DEP_FILE
+  deps = gcc
+  command = C:\ProgramData\MATLAB\SupportPackages\R2024b\3P.instrset\mingw_w64.instrset\bin\gcc.exe $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building C object $out
+
+
+#############################################
 # Rule for compiling CXX files.
 
 rule CXX_COMPILER__UAV_objects_Release
@@ -52,7 +62,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = "C:\Program Files\MATLAB\R2024b\bin\win64\cmake\bin\cmake.exe" --regenerate-during-build -S"C:\Users\soure\Desktop\Uni Sachen\CT-Verification\Possible Controller\Implementation\UAV\UAV_grt_rtw" -B"C:\Users\soure\Desktop\Uni Sachen\CT-Verification\Possible Controller\Implementation\UAV\UAV_grt_rtw\build"
+  command = "C:\Program Files\MATLAB\R2024b\bin\win64\cmake\bin\cmake.exe" --regenerate-during-build -S"C:\Users\soure\Desktop\Uni Sachen\CT-Verification\Implementations\UAV\UAV_grt_rtw" -B"C:\Users\soure\Desktop\Uni Sachen\CT-Verification\Implementations\UAV\UAV_grt_rtw\build"
   description = Re-running CMake...
   generator = 1
 

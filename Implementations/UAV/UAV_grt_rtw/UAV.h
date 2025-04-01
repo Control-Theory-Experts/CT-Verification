@@ -7,9 +7,9 @@
  *
  * Code generation for model "UAV".
  *
- * Model version              : 1.7
+ * Model version              : 1.11
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Thu Feb 27 20:31:25 2025
+ * C++ source code generated on : Mon Mar 31 17:31:06 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -24,7 +24,10 @@
 #include "rtwtypes.h"
 #include "rtw_continuous.h"
 #include "rtw_solver.h"
+#include "rt_logging.h"
+#include "rt_nonfinite.h"
 #include "UAV_types.h"
+#include <cfloat>
 #include <cstring>
 
 /* Macros for accessing real-time model data structure */
@@ -58,6 +61,10 @@
 
 #ifndef rtmSetDerivCacheNeedsReset
 #define rtmSetDerivCacheNeedsReset(rtm, val) ((rtm)->derivCacheNeedsReset = (val))
+#endif
+
+#ifndef rtmGetFinalTime
+#define rtmGetFinalTime(rtm)           ((rtm)->Timing.tFinal)
 #endif
 
 #ifndef rtmGetIntgData
@@ -100,6 +107,10 @@
 #define rtmSetPeriodicContStateRanges(rtm, val) ((rtm)->periodicContStateRanges = (val))
 #endif
 
+#ifndef rtmGetRTWLogInfo
+#define rtmGetRTWLogInfo(rtm)          ((rtm)->rtwLogInfo)
+#endif
+
 #ifndef rtmGetZCCacheNeedsReset
 #define rtmGetZCCacheNeedsReset(rtm)   ((rtm)->zCCacheNeedsReset)
 #endif
@@ -140,6 +151,10 @@
 #define rtmGetT(rtm)                   (rtmGetTPtr((rtm))[0])
 #endif
 
+#ifndef rtmGetTFinal
+#define rtmGetTFinal(rtm)              ((rtm)->Timing.tFinal)
+#endif
+
 #ifndef rtmGetTPtr
 #define rtmGetTPtr(rtm)                ((rtm)->Timing.t)
 #endif
@@ -150,9 +165,17 @@
 
 /* Block signals (default storage) */
 struct B_UAV_T {
+  real_T Ys;                           /* '<Root>/Transfer Fcn' */
   real_T IntegralGain;                 /* '<S33>/Integral Gain' */
   real_T FilterCoefficient;            /* '<S39>/Filter Coefficient' */
   real_T Sum;                          /* '<S45>/Sum' */
+};
+
+/* Block states (default storage) for system '<Root>' */
+struct DW_UAV_T {
+  struct {
+    void *LoggedData;
+  } Scope_PWORK;                       /* '<Root>/Scope' */
 };
 
 /* Continuous states (default storage) */
@@ -229,6 +252,7 @@ struct P_UAV_T_ {
 /* Real-time Model Data Structure */
 struct tag_RTM_UAV_T {
   const char_T *errorStatus;
+  RTWLogInfo *rtwLogInfo;
   RTWSolverInfo solverInfo;
   X_UAV_T *contStates;
   int_T *periodicContStateIndices;
@@ -266,6 +290,7 @@ struct tag_RTM_UAV_T {
     uint32_T clockTick1;
     uint32_T clockTickH1;
     time_T tStart;
+    time_T tFinal;
     SimTimeStep simTimeStep;
     boolean_T stopRequestedFlag;
     time_T *t;
@@ -293,6 +318,9 @@ class UAV final
   /* Real-Time Model get method */
   RT_MODEL_UAV_T * getRTM();
 
+  /* model start function */
+  void start();
+
   /* Initial conditions function */
   void initialize();
 
@@ -312,6 +340,9 @@ class UAV final
  private:
   /* Block signals */
   B_UAV_T UAV_B;
+
+  /* Block states */
+  DW_UAV_T UAV_DW;
 
   /* Tunable parameters */
   static P_UAV_T UAV_P;
@@ -333,12 +364,6 @@ class UAV final
   /* Real-Time Model */
   RT_MODEL_UAV_T UAV_M;
 };
-
-/*-
- * These blocks were eliminated from the model due to optimizations:
- *
- * Block '<Root>/Scope' : Unused code path elimination
- */
 
 /*-
  * The generated code includes comments that allow you to trace directly
