@@ -1,4 +1,8 @@
 # Project Overview
+This project is heavily based on the work of Nils Chur. <br>
+https://github.com/NilsChur/CTSE_Mapping_Properties <br><br>
+Focus of this project is on providing feedback on difficulties and challenges <br>
+encountered during the formal verification of automatically generated source code.
 
 ## Chapter 1 - Literature Review (23.01.2025)
 - Research on various controllers.
@@ -31,10 +35,19 @@
 ## Chapter 6 - Code Analysis (26.02.2025)
 - Understanding the generated C++ code and its structure.
 
-## Chapter 7 - Get started with Divine Model Checker (19.03.2025)
-- Download of Divine
-- Get to know the functionality
+## Chapter 7 - Download and setup DIVINE Model Checker (05.03.2025)
+- Used version: 4.4.2
+- Used source: https://divine.fi.muni.cz/manual.html
+- 4.4.4 had no manual at the time of this project.
 
-## Chapter 8 - Main Methode für den cpp-Code
-- 
--
+## Chapter 8 - Get started with DIVINE (19.03.2025)
+- Familiarization with its functionality
+
+## Chapter 9 - Include an observer as FSM (26.03.2025)
+- Modified files: `main.cpp` , `MODEL.cpp`, `MODEL.h`, `CMakeLists.txt`
+- Added files: `Observer.h`, `Observer.cpp`, `ObserverState.h`,<br>
+  `ConcreteObserverStates.h`, `ConcreteObserverStates.cpp`
+
+## Chapter 10 - Configuration (02.04.2025)
+- Integrate DIVINE and the observer into the source code.
+- Create a Makefile to manage the build process.
