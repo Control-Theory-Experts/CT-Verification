@@ -192,7 +192,7 @@ void UAV::step()
   * The output of the system is captured by the variable:       UAV_B.Ys
   * 
   */
-  ObserverFSM.setExternalInput(rtb_step, rtb_error, UAV_B.Ys, timing);
+  ObserverFSM.setExternalInput(rtb_step, rtb_error, UAV_B, timing);
   ObserverFSM.transition();
 
 

@@ -72,6 +72,16 @@ meet your application requirements.
 /*==========*
  * Includes *
  *==========*/
+#include "Velocity_Controlled_Vehicle.h"
+#include "Observer.h"
+#include <iostream>
+
+// For DIVINE
+
+#include <dios.h>
+#include <sys/divm.h>
+#include <stdbool.h>
+#include <map>
 
 #include "rtwtypes.h"
 #if !defined(INTEGER_CODE) || INTEGER_CODE == 0
@@ -422,6 +432,82 @@ static int_T rt_TermModel(MODEL_CLASSNAME & mdl)
     return(0);
 }
 
+/* Implementation of büchi automata constructed with Spot online tool */
+
+// Checks if the system reaches the rise state
+int nextRise(int state, bool RiseAP){
+    __dios_trace_f("Rise: %x", RiseAP);
+
+    switch(state) {
+        case -1:
+            return 1;
+
+        case 0:
+            __vm_ctl_flag(0, _VM_CF_Accepting);
+            if(RiseAP) {return 0;}
+
+        case 1:
+            if(RiseAP) {return 0;}
+            if(!RiseAP) {return 1;}
+
+        default:
+            return state;
+    }
+};
+
+// Checks if the system reaches the overshoot state
+int nextOvershoot(int state, bool OvershootAP){
+    __dios_trace_f("Overshoot; %x", OvershootAP);
+    switch (state) {
+        case -1: // initial state
+            return 0; // state is now initilized but not visited
+        case 0:
+            __vm_ctl_flag(0, _VM_CF_Accepting);
+            if(!OvershootAP) {return 0;}
+            if(OvershootAP) {return 1;}
+        case 1:
+            __vm_ctl_flag(0, _VM_CF_Error);
+            if (OvershootAP) {return 1;}
+        default:
+            return state;
+   }
+};
+
+// Checks if the system reaches a bounded state, therfore, is stable but not necesseraly within settling time 
+int nextBounded(int state, bool BoundedAP){
+   __dios_trace_f("Bounded: %x", BoundedAP); 
+    switch(state) {
+        case -1:
+            return 1;
+        case 0:
+            __vm_ctl_flag(0, _VM_CF_Accepting);
+            if(BoundedAP) {return 0;}
+        case 1:
+            if(BoundedAP) {return 0;}
+            if(!BoundedAP) {return 1;}
+        default:
+            return state;
+    }
+};
+
+// Checks if the system reaches a stable state within the settling time
+int nextSettlingTime(int state, bool StableAP){
+   __dios_trace_f("Settling Time: %x", StableAP); 
+   switch(state) {
+    case -1:
+        return 1;
+    case 0:
+        __vm_ctl_flag(0, _VM_CF_Accepting);
+        if(StableAP) {return 0;}
+    case 1:
+        if(StableAP) {return 0;}
+        if(!StableAP) {return 1;}
+    default:
+        return state;
+   }
+};
+
+
 /* Function: main =============================================================
  *
  * Abstract:
@@ -480,12 +566,32 @@ int_T main(int_T argc, const char *argv[])
      * background task.  Note that the generated code sets error status    *
      * to "Simulation finished" when MatFileLogging is specified in TLC.   *
      ***********************************************************************/
+    
+    /*
+    * Initialize Observer thresholds epsilon, overshoot, rise level, rise time and settling time
+    */
+    MODEL_INSTANCE.ObserverFSM.initialThreshold(5.0, 10.0, 90.0, 1.5, 5.0);
+
+    /* 
+     * Init states for model checking with Divine
+     * For each büchi automata an old and current state is needed
+    */
+    int stateRise = -1, oldStateRise = 0;
+    int stateOvershoot = -1, oldStateOvershoot = 0;
+    int stateBounded = -1, oldStateBounded = 0;
+    int stateSettlingTime = -1, oldStateSettlingTime = 0;
 
   #if defined(rtmGetErrorStatus)
     while (rtmGetErrorStatus(MODEL_INSTANCE.getRTM()) == NULL) {
   #else
     while (MODEL_INSTANCE.getRTM()->getErrorStatus() == NULL) {
   #endif
+
+        __dios_reschedule();
+        oldStateRise = stateRise; 
+        oldStateOvershoot = stateOvershoot;
+        oldStateBounded = stateBounded;
+        oldStateSettlingTime = stateSettlingTime;
 
      #if defined(rtmGetStopRequested)  
         if(rtmGetStopRequested(MODEL_INSTANCE.getRTM())) break;
@@ -523,6 +629,17 @@ int_T main(int_T argc, const char *argv[])
                         (boolean_T *)&(MODEL_INSTANCE.getRTM()->getStopRequested()));
      #endif
         rt_OneStep(MODEL_INSTANCE);
+        
+        // Each Büchi automaton is updated 
+        stateRise = nextRise(stateRise, MODEL_INSTANCE.ObserverFSM.wasRiseVisited());
+        stateOvershoot = nextOvershoot(stateOvershoot, MODEL_INSTANCE.ObserverFSM.wasOvershootVisited());
+        stateBounded = nextBounded(stateBounded, MODEL_INSTANCE.ObserverFSM.wasBoundedVisited());
+        stateSettlingTime = nextSettlingTime(stateSettlingTime, MODEL_INSTANCE.ObserverFSM.wasRestVisited());
+
+        __dios_trace_f( "state rise: %d -> %d", oldStateRise, stateRise );
+        __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
+        __dios_trace_f( "state overshoot: %d -> %d", oldStateOvershoot, stateOvershoot );
+        __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
     }
 
 

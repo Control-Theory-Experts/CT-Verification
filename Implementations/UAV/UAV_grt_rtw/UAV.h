@@ -30,6 +30,10 @@
 #include <cfloat>
 #include <cstring>
 
+/* Include Observer */
+#include "Observer.h"
+#include "ObserverState.h"
+
 /* Macros for accessing real-time model data structure */
 #ifndef rtmGetContStateDisabled
 #define rtmGetContStateDisabled(rtm)   ((rtm)->contStateDisabled)
@@ -363,6 +367,8 @@ class UAV final
 
   /* Real-Time Model */
   RT_MODEL_UAV_T UAV_M;
+
+  Observer ObserverFSM;
 };
 
 /*-
