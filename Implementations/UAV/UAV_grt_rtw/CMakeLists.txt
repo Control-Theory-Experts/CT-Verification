@@ -28,11 +28,11 @@ get_filename_component(START_DIR .. ABSOLUTE)
 # 
 # 	cmake . -DMATLAB_ROOT=/path/to/another/matlab/root
 set(MATLAB_ROOT /mnt/c/Program\ Files/MATLAB/R2024b CACHE PATH "")
-set(DIVINE_ROOT /mnt/c/users/soure/Programs/divine-4.4.2)
+# set(DIVINE_ROOT /mnt/c/users/soure/Programs/divine-4.4.2)
 
-set(CMAKE_C_STANDARD 90)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-add_definitions(-D_VM_CR_User2=1)
+# set(CMAKE_C_STANDARD 90)
+# set(CMAKE_C_STANDARD_REQUIRED ON)
+# add_definitions(-D_VM_CR_User2=1)
 # add_definitions(-U__MATHCALL)
 
 ###########################################################################
@@ -89,9 +89,9 @@ target_include_directories(UAV_objects PUBLIC $<BUILD_INTERFACE:${START_DIR}>
     $<BUILD_INTERFACE:${MATLAB_ROOT}/extern/include>
     $<BUILD_INTERFACE:${MATLAB_ROOT}/simulink/include>
     $<BUILD_INTERFACE:${MATLAB_ROOT}/rtw/c/src>
-    $<BUILD_INTERFACE:${MATLAB_ROOT}/rtw/c/src/ext_mode/common>
-    $<BUILD_INTERFACE:${DIVINE_ROOT}/dios/include>
-    $<BUILD_INTERFACE:${DIVINE_ROOT}/_build.release/dios/include>)
+    $<BUILD_INTERFACE:${MATLAB_ROOT}/rtw/c/src/ext_mode/common>)
+#    $<BUILD_INTERFACE:${DIVINE_ROOT}/dios/include>
+#    $<BUILD_INTERFACE:${DIVINE_ROOT}/_build.release/dios/include>
 
 # Specify library link dependencies for target "UAV_objects". CMake 
 # generator expressions are used to create a CMakeLists.txt file that 

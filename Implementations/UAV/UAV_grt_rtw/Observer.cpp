@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <cstdio>
+#include <vector>
 #include "Observer.h"
 #include "ConcreteObserverStates.h"
 
@@ -51,7 +52,7 @@ void Observer::transition() {
 */
 void Observer::setExternalInput(double Input1, double Input2, double Input3, double Input4) {
     reference = Input1;
-    error = fabs(Input2/Input1)*100;
+    error = (Input1 != 0.0) ? fabs(Input2/Input1)*100 : 0.0;
     sysOut = Input3;
     time = Input4;
 }
@@ -91,6 +92,11 @@ bool Observer::wasOvershootVisited(){
 // Returns true or false of Bounded was entered
 bool Observer::wasBoundedVisited(){
     return boundedWasEntered;
+}
+
+// Returns an array of booleans, representing which States were visited
+std::vector<bool> Observer::visitedStates(){
+    return {restWasEntered, transientWasEntered, riseWasEntered, overshootWasEntered, boundedWasEntered};
 }
 
 void Observer::setRestVisited(){

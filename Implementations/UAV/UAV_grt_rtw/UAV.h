@@ -322,6 +322,8 @@ class UAV final
   /* Real-Time Model get method */
   RT_MODEL_UAV_T * getRTM();
 
+  Observer ObserverFSM;
+
   /* model start function */
   void start();
 
@@ -367,8 +369,6 @@ class UAV final
 
   /* Real-Time Model */
   RT_MODEL_UAV_T UAV_M;
-
-  Observer ObserverFSM;
 };
 
 /*-

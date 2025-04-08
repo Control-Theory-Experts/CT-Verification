@@ -77,11 +77,14 @@ meet your application requirements.
 #include "Observer.h"
 
 // For DIVINE
+// # define DIVINE
 
+#ifdef DIVINE
 #include <dios.h>
 #include <sys/divm.h>
 #include <stdbool.h>
 #include <map>
+#endif
 
 #include "rtwtypes.h"
 #if !defined(INTEGER_CODE) || INTEGER_CODE == 0
@@ -436,14 +439,18 @@ static int_T rt_TermModel(MODEL_CLASSNAME & mdl)
 
 // Checks if the system reaches the rise state
 int nextRise(int state, bool RiseAP){
+  #ifdef DIVINE
     __dios_trace_f("Rise: %x", RiseAP);
+  #endif
 
     switch(state) {
         case -1:
             return 1;
 
         case 0:
+          #ifdef DIVINE
             __vm_ctl_flag(0, _VM_CF_Accepting);
+          #endif
             if(RiseAP) {return 0;}
 
         case 1:
@@ -457,16 +464,22 @@ int nextRise(int state, bool RiseAP){
 
 // Checks if the system reaches the overshoot state
 int nextOvershoot(int state, bool OvershootAP){
+  #ifdef DIVINE
     __dios_trace_f("Overshoot; %x", OvershootAP);
+  #endif
     switch (state) {
         case -1: // initial state
             return 0; // state is now initilized but not visited
         case 0:
+          #ifdef DIVINE
             __vm_ctl_flag(0, _VM_CF_Accepting);
+          #endif
             if(!OvershootAP) {return 0;}
             if(OvershootAP) {return 1;}
         case 1:
+          #ifdef DIVINE        
             __vm_ctl_flag(0, _VM_CF_Error);
+          #endif            
             if (OvershootAP) {return 1;}
         default:
             return state;
@@ -475,12 +488,16 @@ int nextOvershoot(int state, bool OvershootAP){
 
 // Checks if the system reaches a bounded state, therfore, is stable but not necesseraly within settling time 
 int nextBounded(int state, bool BoundedAP){
-   __dios_trace_f("Bounded: %x", BoundedAP); 
+  #ifdef DIVINE
+    __dios_trace_f("Bounded: %x", BoundedAP);
+  #endif
     switch(state) {
         case -1:
             return 1;
         case 0:
+          #ifdef DIVINE
             __vm_ctl_flag(0, _VM_CF_Accepting);
+          #endif
             if(BoundedAP) {return 0;}
         case 1:
             if(BoundedAP) {return 0;}
@@ -492,21 +509,24 @@ int nextBounded(int state, bool BoundedAP){
 
 // Checks if the system reaches a stable state within the settling time
 int nextSettlingTime(int state, bool StableAP){
-   __dios_trace_f("Settling Time: %x", StableAP); 
-   switch(state) {
-    case -1:
-        return 1;
-    case 0:
-        __vm_ctl_flag(0, _VM_CF_Accepting);
-        if(StableAP) {return 0;}
-    case 1:
-        if(StableAP) {return 0;}
-        if(!StableAP) {return 1;}
-    default:
-        return state;
+  #ifdef DIVINE
+    __dios_trace_f("Settling Time: %x", StableAP);
+  #endif
+    switch(state) {
+      case -1:
+          return 1;
+      case 0:
+        #ifdef DIVINE
+          __vm_ctl_flag(0, _VM_CF_Accepting);
+        #endif
+          if(StableAP) {return 0;}
+      case 1:
+          if(StableAP) {return 0;}
+          if(!StableAP) {return 1;}
+      default:
+          return state;
    }
 };
-
 
 /* Function: main =============================================================
  *
@@ -568,9 +588,9 @@ int_T main(int_T argc, const char *argv[])
      ***********************************************************************/
     
     /*
-    * Initialize Observer thresholds epsilon, overshoot, rise level, rise time and settling time
+    * Initialize Observer thresholds: epsilon, overshoot, rise level, rise time and settling time
     */
-    MODEL_INSTANCE.ObserverFSM.initialThreshold(5.0, 10.0, 90.0, 1.5, 5.0);
+    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 27.0, 90.0, 0.07, 1.4);
 
     /* 
      * Init states for model checking with Divine
@@ -587,7 +607,9 @@ int_T main(int_T argc, const char *argv[])
     while (MODEL_INSTANCE.getRTM()->getErrorStatus() == NULL) {
   #endif
 
+      #ifdef DIVINE
         __dios_reschedule();
+      #endif
         oldStateRise = stateRise; 
         oldStateOvershoot = stateOvershoot;
         oldStateBounded = stateBounded;
@@ -636,11 +658,20 @@ int_T main(int_T argc, const char *argv[])
         stateBounded = nextBounded(stateBounded, MODEL_INSTANCE.ObserverFSM.wasBoundedVisited());
         stateSettlingTime = nextSettlingTime(stateSettlingTime, MODEL_INSTANCE.ObserverFSM.wasRestVisited());
 
+      #ifdef DIVINE
         __dios_trace_f( "state rise: %d -> %d", oldStateRise, stateRise );
         __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
         __dios_trace_f( "state overshoot: %d -> %d", oldStateOvershoot, stateOvershoot );
         __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
+      #endif
     }
+
+    std::cout << "States: [Rest, Transient, Rise, Overshoot, Bounded]\nVisited: [";
+    std::vector<bool> visitedStates = MODEL_INSTANCE.ObserverFSM.visitedStates();
+    for (bool visited : visitedStates) {
+        std::cout << visited << " ";
+    }
+    std::cout << "]\n";
 
 
     /*******************************

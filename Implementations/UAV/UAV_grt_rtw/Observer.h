@@ -7,6 +7,7 @@
 #pragma once
 #include "ObserverState.h"
 #include <chrono>
+#include <vector>
 
 // Forward declarations to resolve circular dependencies
 class ObserverState;
@@ -92,7 +93,11 @@ class Observer {
         */
         bool wasBoundedVisited();
 
-
+        /*
+        * Returns a boolean array of all visited states in the following order:
+        * [rest, transient, rise, overshoot, bounded]
+        */
+       std::vector<bool> visitedStates();
         
         /*
         * Sets the boolean wasRestVisited to true

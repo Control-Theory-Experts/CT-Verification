@@ -3,15 +3,15 @@
 
 # compile C with /usr/bin/clang
 # compile CXX with /usr/bin/clang++
-C_DEFINES = -DALLOCATIONFCN=0 -DCLASSIC_INTERFACE=0 -DHAVESTDIO -DINTEGER_CODE=0 -DMAT_FILE=1 -DMODEL=UAV -DMT=0 -DMULTI_INSTANCE_CODE=1 -DNCSTATES=5 -DNUMST=2 -DONESTEPFCN=1 -DRT -DTERMFCN=1 -DTID01EQ=1 -DUSE_RTMODEL -D_VM_CR_User2=1
+C_DEFINES = -DALLOCATIONFCN=0 -DCLASSIC_INTERFACE=0 -DHAVESTDIO -DINTEGER_CODE=0 -DMAT_FILE=1 -DMODEL=UAV -DMT=0 -DMULTI_INSTANCE_CODE=1 -DNCSTATES=5 -DNUMST=2 -DONESTEPFCN=1 -DRT -DTERMFCN=1 -DTID01EQ=1 -DUSE_RTMODEL
 
-C_INCLUDES = -I"/mnt/c/users/soure/Desktop/Uni Sachen/CT-Verification/Implementations/UAV" -I"/mnt/c/users/soure/Desktop/Uni Sachen/CT-Verification/Implementations/UAV/UAV_grt_rtw" -I"/mnt/c/Program Files/MATLAB/R2024b/extern/include" -I"/mnt/c/Program Files/MATLAB/R2024b/simulink/include" -I"/mnt/c/Program Files/MATLAB/R2024b/rtw/c/src" -I"/mnt/c/Program Files/MATLAB/R2024b/rtw/c/src/ext_mode/common" -I/mnt/c/users/soure/Programs/divine-4.4.2/dios/include -I/mnt/c/users/soure/Programs/divine-4.4.2/_build.release/dios/include
+C_INCLUDES = -I"/mnt/c/users/soure/Desktop/Uni Sachen/CT-Verification/Implementations/UAV" -I"/mnt/c/users/soure/Desktop/Uni Sachen/CT-Verification/Implementations/UAV/UAV_grt_rtw" -I"/mnt/c/Program Files/MATLAB/R2024b/extern/include" -I"/mnt/c/Program Files/MATLAB/R2024b/simulink/include" -I"/mnt/c/Program Files/MATLAB/R2024b/rtw/c/src" -I"/mnt/c/Program Files/MATLAB/R2024b/rtw/c/src/ext_mode/common"
 
-C_FLAGS = -std=gnu90 -fPIC
+C_FLAGS = -fPIC
 
-CXX_DEFINES = -DALLOCATIONFCN=0 -DCLASSIC_INTERFACE=0 -DHAVESTDIO -DINTEGER_CODE=0 -DMAT_FILE=1 -DMODEL=UAV -DMT=0 -DMULTI_INSTANCE_CODE=1 -DNCSTATES=5 -DNUMST=2 -DONESTEPFCN=1 -DRT -DTERMFCN=1 -DTID01EQ=1 -DUSE_RTMODEL -D_VM_CR_User2=1
+CXX_DEFINES = -DALLOCATIONFCN=0 -DCLASSIC_INTERFACE=0 -DHAVESTDIO -DINTEGER_CODE=0 -DMAT_FILE=1 -DMODEL=UAV -DMT=0 -DMULTI_INSTANCE_CODE=1 -DNCSTATES=5 -DNUMST=2 -DONESTEPFCN=1 -DRT -DTERMFCN=1 -DTID01EQ=1 -DUSE_RTMODEL
 
-CXX_INCLUDES = -I"/mnt/c/users/soure/Desktop/Uni Sachen/CT-Verification/Implementations/UAV" -I"/mnt/c/users/soure/Desktop/Uni Sachen/CT-Verification/Implementations/UAV/UAV_grt_rtw" -I"/mnt/c/Program Files/MATLAB/R2024b/extern/include" -I"/mnt/c/Program Files/MATLAB/R2024b/simulink/include" -I"/mnt/c/Program Files/MATLAB/R2024b/rtw/c/src" -I"/mnt/c/Program Files/MATLAB/R2024b/rtw/c/src/ext_mode/common" -I/mnt/c/users/soure/Programs/divine-4.4.2/dios/include -I/mnt/c/users/soure/Programs/divine-4.4.2/_build.release/dios/include
+CXX_INCLUDES = -I"/mnt/c/users/soure/Desktop/Uni Sachen/CT-Verification/Implementations/UAV" -I"/mnt/c/users/soure/Desktop/Uni Sachen/CT-Verification/Implementations/UAV/UAV_grt_rtw" -I"/mnt/c/Program Files/MATLAB/R2024b/extern/include" -I"/mnt/c/Program Files/MATLAB/R2024b/simulink/include" -I"/mnt/c/Program Files/MATLAB/R2024b/rtw/c/src" -I"/mnt/c/Program Files/MATLAB/R2024b/rtw/c/src/ext_mode/common"
 
 CXX_FLAGS = -fPIC
 
