@@ -1,6 +1,7 @@
 # Project Overview
 This project is heavily based on the work of Nils Chur. <br>
-https://github.com/NilsChur/CTSE_Mapping_Properties <br><br>
+https://github.com/NilsChur/CTSE_Mapping_Properties <br>
+
 Focus of this project is on providing feedback on difficulties and challenges <br>
 encountered during the formal verification of automatically generated source code.
 
@@ -41,7 +42,7 @@ encountered during the formal verification of automatically generated source cod
 - 4.4.4 had no manual at the time of this project.
 
 ## Chapter 8 - Get started with DIVINE (19.03.2025)
-- Familiarization with its functionality
+- Familiarization with its functionality and documentation
 
 ## Chapter 9 - Include an observer as FSM (26.03.2025)
 - Modified files: `main.cpp` , `MODEL.cpp`, `MODEL.h`, `CMakeLists.txt`
@@ -51,3 +52,5 @@ encountered during the formal verification of automatically generated source cod
 ## Chapter 10 - Configuration (02.04.2025)
 - Integrate DIVINE and the observer into the source code.
 - Create a Makefile to manage the build process.
+  - Make-Command: `make -f MODEL.mk divine-build`
+- Test the observer by checking visited states
