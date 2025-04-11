@@ -52,7 +52,7 @@ void Observer::transition() {
 */
 void Observer::setExternalInput(double Input1, double Input2, double Input3, double Input4) {
     reference = Input1;
-    error = (Input1 != 0.0) ? fabs(Input2/Input1)*100 : 0.0;
+    error = (Input1 != 0.0) ? fabs(Input2/Input1)*100 : Input2;
     sysOut = Input3;
     time = Input4;
 }

@@ -22,6 +22,8 @@ ObserverState& Transient::getInstance() {
     return singleton;
 }
 
+double Transient::transientEnteredTime = 0.0;
+
 ObserverState& Rise::getInstance() {
     static Rise singleton;
     return singleton;
@@ -44,8 +46,8 @@ void Rest::transition(Observer* observer) {
 
     // !!! GUARD CONDITIONS MAY NEED TO BE ADJUSTED !!!
 
-    // Transition Rest -> Transient 
-    if (observer->reference != 0 && observer->error >= observer->epsilon) { // should transit as soon as a reference is set (/=0), therefore, true.
+    // Transition: Rest -> Transient 
+    if (observer->reference != 0 && observer->error >= observer->epsilon) {
         observer->setState(Transient::getInstance());
     }
     // Selfloop
@@ -59,29 +61,30 @@ void Rest::transition(Observer* observer) {
 */
 void Transient::transition(Observer* observer) {
 
+    // Save time when transient was entered for the first time
+    if (!observer->wasTransientVisited()) transientEnteredTime = observer->time;
+
     // Sets the boolean for Transient to true, because Transient is now visited
     observer->setTransientVisited();
 
     // !!! GUARD CONDITIONS MAY NEED TO BE ADJUSTED !!!
 
-
-    // Transition Transient -> Rise
-    if (observer->error <= observer->riseLevel && observer->time <= observer->riseTime && observer->wasRiseVisited() == false){
+    // Transition: Transient -> Rise
+    if (observer->error <= observer->riseLevel && observer->time <= (transientEnteredTime + observer->riseTime) && observer->wasRiseVisited() == false) {
         observer->setState(Rise::getInstance());
     }
 
-    // Transition Transient -> Bounded
+    // Transition: Transient -> Bounded
     else if (observer->error <= observer->epsilon) {
         observer->setState(Bounded::getInstance());
     }
 
-    // Transition Transient -> Overshoot
+    // Transition: Transient -> Overshoot
     else if (observer->sysOut > observer->overshootLevel*observer->reference)
     {
         observer->setState(Overshoot::getInstance());
     }
     
-
     // Selfloop
     else {
         observer->setState(Transient::getInstance());
@@ -97,12 +100,13 @@ void Rise::transition(Observer* observer) {
     observer->setRistVisited();
 
     // !!! GUARD CONDITIONS MAY NEED TO BE ADJUSTED !!!
-    // Transition Rise -> Overshoot
+
+    // Transition: Rise -> Overshoot
     if (observer->sysOut > observer->overshootLevel*observer->reference) {
         observer->setState(Overshoot::getInstance());
     }
 
-    // Transition Rise -> Bounded
+    // Transition: Rise -> Bounded
     else if (observer->error <= observer->epsilon) {
         observer->setState(Bounded::getInstance());
     }
@@ -123,13 +127,13 @@ void Overshoot::transition(Observer* observer) {
 
     // !!! GUARD CONDITIONS MAY NEED TO BE ADJUSTED !!!
 
-    // Transition Overshoot -> Bounded
+    // Transition: Overshoot -> Bounded
     if (observer->error <= observer->epsilon)
     {
         observer->setState(Bounded::getInstance());
     }
     
-    // Transition Overshoot -> Transient
+    // Transition: Overshoot -> Transient
     else if (observer->sysOut <= observer->overshootLevel*observer->reference && observer->error > observer->epsilon)
     {
         observer->setState(Transient::getInstance());
@@ -140,7 +144,6 @@ void Overshoot::transition(Observer* observer) {
     {
         observer->setState(Overshoot::getInstance());
     }
-    
 }
 
 /*
@@ -153,11 +156,12 @@ void Bounded::transition(Observer* observer) {
     
     if (counterReset == true) {
         counterBounded = 0;
+        lastBounded = observer->time;
     }
 
     // !!! GUARD CONDITIONS MAY NEED TO BE ADJUSTED !!!
 
-    // Transition Bounded -> Rest
+    // Transition: Bounded -> Rest
     if (observer->error <= observer->epsilon && (observer->time - counterBounded) <= observer->settlingTime && counterBounded >= counterLimit)
     {
         observer->setState(Rest::getInstance());
@@ -165,14 +169,14 @@ void Bounded::transition(Observer* observer) {
         observer->setRestVisited();
     }
     
-    // Transition Bounded -> Transient
+    // Transition: Bounded -> Transient
     else if (observer->error > observer->epsilon && observer->sysOut <= observer->overshootLevel*observer->reference)
     {
         observer->setState(Transient::getInstance());
         counterReset = true;
     }
 
-    // Transition Bounded -> Overshoot
+    // Transition: Bounded -> Overshoot
     else if (observer->error > observer->epsilon && observer->sysOut > observer->overshootLevel*observer->reference)
     {
         observer->setState(Overshoot::getInstance());
@@ -184,7 +188,7 @@ void Bounded::transition(Observer* observer) {
     {
         observer->setState(Bounded::getInstance());
         counterReset = false;
+        counterBounded += observer->time - lastBounded;
+        lastBounded = observer->time;
     }
-    
-    
 }

@@ -1,5 +1,5 @@
 ###########################################################################
-## Adapted generated Makefile for component 'UAV'. 
+## Adapted generated Makefile for component 'Velocity_Controlled_Vehicle'. 
 ## Hopefully it works for UAV as well
 ##
 ## Makefile     : UAV.mk

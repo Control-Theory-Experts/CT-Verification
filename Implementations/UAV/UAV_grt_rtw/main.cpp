@@ -75,6 +75,7 @@ meet your application requirements.
 #include <iostream>
 #include "UAV.h"
 #include "Observer.h"
+# define OBSERVER_TEST
 
 // For DIVINE
 // # define DIVINE
@@ -435,22 +436,19 @@ static int_T rt_TermModel(MODEL_CLASSNAME & mdl)
     return(0);
 }
 
+#ifdef DIVINE
 /* Implementation of büchi automata constructed with Spot online tool */
 
 // Checks if the system reaches the rise state
 int nextRise(int state, bool RiseAP){
-  #ifdef DIVINE
     __dios_trace_f("Rise: %x", RiseAP);
-  #endif
 
     switch(state) {
         case -1:
             return 1;
 
         case 0:
-          #ifdef DIVINE
             __vm_ctl_flag(0, _VM_CF_Accepting);
-          #endif
             if(RiseAP) {return 0;}
 
         case 1:
@@ -471,9 +469,7 @@ int nextOvershoot(int state, bool OvershootAP){
         case -1: // initial state
             return 0; // state is now initilized but not visited
         case 0:
-          #ifdef DIVINE
             __vm_ctl_flag(0, _VM_CF_Accepting);
-          #endif
             if(!OvershootAP) {return 0;}
             if(OvershootAP) {return 1;}
         case 1:
@@ -495,9 +491,7 @@ int nextBounded(int state, bool BoundedAP){
         case -1:
             return 1;
         case 0:
-          #ifdef DIVINE
             __vm_ctl_flag(0, _VM_CF_Accepting);
-          #endif
             if(BoundedAP) {return 0;}
         case 1:
             if(BoundedAP) {return 0;}
@@ -516,9 +510,7 @@ int nextSettlingTime(int state, bool StableAP){
       case -1:
           return 1;
       case 0:
-        #ifdef DIVINE
           __vm_ctl_flag(0, _VM_CF_Accepting);
-        #endif
           if(StableAP) {return 0;}
       case 1:
           if(StableAP) {return 0;}
@@ -527,6 +519,7 @@ int nextSettlingTime(int state, bool StableAP){
           return state;
    }
 };
+#endif
 
 /* Function: main =============================================================
  *
@@ -590,8 +583,8 @@ int_T main(int_T argc, const char *argv[])
     /*
     * Initialize Observer thresholds: epsilon, overshoot, rise level, rise time and settling time
     */
-    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 27.0, 90.0, 0.07, 1.4);
-
+    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 27.0, 90.0, 0.07, 1.5);
+  #ifdef DIVINE  
     /* 
      * Init states for model checking with Divine
      * For each büchi automata an old and current state is needed
@@ -600,6 +593,7 @@ int_T main(int_T argc, const char *argv[])
     int stateOvershoot = -1, oldStateOvershoot = 0;
     int stateBounded = -1, oldStateBounded = 0;
     int stateSettlingTime = -1, oldStateSettlingTime = 0;
+  #endif
 
   #if defined(rtmGetErrorStatus)
     while (rtmGetErrorStatus(MODEL_INSTANCE.getRTM()) == NULL) {
@@ -609,11 +603,11 @@ int_T main(int_T argc, const char *argv[])
 
       #ifdef DIVINE
         __dios_reschedule();
-      #endif
         oldStateRise = stateRise; 
         oldStateOvershoot = stateOvershoot;
         oldStateBounded = stateBounded;
         oldStateSettlingTime = stateSettlingTime;
+      #endif
 
      #if defined(rtmGetStopRequested)  
         if(rtmGetStopRequested(MODEL_INSTANCE.getRTM())) break;
@@ -621,7 +615,6 @@ int_T main(int_T argc, const char *argv[])
         if(MODEL_INSTANCE.getRTM()->getStopRequested()) break;
      #endif
             
-
      #if defined(rtmGetRTWExtModeInfo) &&  defined(rtmGetStopRequested) 
         rtExtModePauseIfNeeded(rtmGetRTWExtModeInfo(MODEL_INSTANCE.getRTM()),
                                NUMST,
@@ -652,26 +645,28 @@ int_T main(int_T argc, const char *argv[])
      #endif
         rt_OneStep(MODEL_INSTANCE);
         
+      #ifdef DIVINE
         // Each Büchi automaton is updated 
         stateRise = nextRise(stateRise, MODEL_INSTANCE.ObserverFSM.wasRiseVisited());
         stateOvershoot = nextOvershoot(stateOvershoot, MODEL_INSTANCE.ObserverFSM.wasOvershootVisited());
         stateBounded = nextBounded(stateBounded, MODEL_INSTANCE.ObserverFSM.wasBoundedVisited());
         stateSettlingTime = nextSettlingTime(stateSettlingTime, MODEL_INSTANCE.ObserverFSM.wasRestVisited());
 
-      #ifdef DIVINE
         __dios_trace_f( "state rise: %d -> %d", oldStateRise, stateRise );
         __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
         __dios_trace_f( "state overshoot: %d -> %d", oldStateOvershoot, stateOvershoot );
         __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
       #endif
     }
-
-    std::cout << "States: [Rest, Transient, Rise, Overshoot, Bounded]\nVisited: [";
+  
+  #ifdef OBSERVER_TEST
+    std::cout << "States: [Rest, Transient, Rise, Overshoot, Bounded]\nVisited: [ ";
     std::vector<bool> visitedStates = MODEL_INSTANCE.ObserverFSM.visitedStates();
     for (bool visited : visitedStates) {
         std::cout << visited << " ";
     }
     std::cout << "]\n";
+  #endif
 
 
     /*******************************

@@ -27,6 +27,7 @@ class Transient : public ObserverState {
     public:
         void transition(Observer* observer);
         static ObserverState& getInstance();
+        static double transientEnteredTime;
 
     private:
         Transient() {}
@@ -67,9 +68,10 @@ class Bounded : public ObserverState {
     private:
 
         double counterBounded = 0;
+        double lastBounded = 0;
 
         // This boolen track if the counter should be reseted or just go on
-        bool counterReset = false;
+        bool counterReset = true;
 
         /* 
         * counterLimit is the value in seconds that the FSM must remain in Bounded.
@@ -77,7 +79,7 @@ class Bounded : public ObserverState {
         * This is iterative, therefore, each time the state is entered, the counter is increased.
         * Number of times bounded should be entered at least before it is assumed to be stable/at rest.
         */
-        double counterLimit = 20; 
+        double counterLimit = 0.3; 
 
         Bounded() {}
         Bounded(const Bounded& other);
