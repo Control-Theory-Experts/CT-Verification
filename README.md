@@ -53,4 +53,7 @@ encountered during the formal verification of automatically generated source cod
 - Integrate DIVINE and the observer into the source code.
 - Create a Makefile to manage the build process.
   - Make-Command: `make -f MODEL.mk divine-build`
-- Test the observer by checking visited states
+
+## Chapter 11 - Testing Observer
+- Test the observer with unit tests by checking visited states
+- Adjust guards if needed
