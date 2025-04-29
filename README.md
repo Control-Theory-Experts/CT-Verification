@@ -54,6 +54,15 @@ encountered during the formal verification of automatically generated source cod
 - Create a Makefile to manage the build process.
   - Make-Command: `make -f MODEL.mk divine-build`
 
-## Chapter 11 - Testing Observer
+## Chapter 11 - Testing Observer (09.04.2025)
 - Test the observer with unit tests by checking visited states
+  - Test-code can be enabled with the macro `OBSERVER_TEST` in `main.cpp`
 - Adjust guards if needed
+
+## Chapter 12 - Verify Source Code (16.04.2025)
+- Model-check source code using DIVINE
+  - Model checking can be enabled with the macro `DIVINE` in `main.cpp`
+- Results stored in `./Results`
+
+## Chapter 13 - Experience Report
+- https://docs.google.com/document/d/1EajEFsVAdPnuhrzTmGF_WBm8l44Fj_0xyW12ItAjTZ4/edit?usp=sharing
