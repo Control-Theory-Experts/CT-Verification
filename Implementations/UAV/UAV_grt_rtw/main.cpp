@@ -1,7 +1,7 @@
 /* 
  * Copyright 2013-2023 The MathWorks, Inc.
  *
- * File: rt_cppclass_main.cpp
+ * File: main.cpp
  *
  * Abstract:
  *
@@ -69,17 +69,25 @@ meet your application requirements.
 # define MATFILE QUOTE(SAVEFILE)
 #endif
 
+
+/*==========*
+ * Defines *
+ *==========*/
+
+// States if the model should output the visited FSM states
+//# define OBSERVER_TEST
+
+// States if DIVINE model checker should be included
+# define DIVINE
+
 /*==========*
  * Includes *
  *==========*/
 #include <iostream>
 #include "UAV.h"
 #include "Observer.h"
-# define OBSERVER_TEST
 
 // For DIVINE
-// # define DIVINE
-
 #ifdef DIVINE
 #include <dios.h>
 #include <sys/divm.h>
@@ -442,7 +450,6 @@ static int_T rt_TermModel(MODEL_CLASSNAME & mdl)
 // Checks if the system reaches the rise state
 int nextRise(int state, bool RiseAP){
     __dios_trace_f("Rise: %x", RiseAP);
-
     switch(state) {
         case -1:
             return 1;
@@ -462,9 +469,7 @@ int nextRise(int state, bool RiseAP){
 
 // Checks if the system reaches the overshoot state
 int nextOvershoot(int state, bool OvershootAP){
-  #ifdef DIVINE
     __dios_trace_f("Overshoot; %x", OvershootAP);
-  #endif
     switch (state) {
         case -1: // initial state
             return 0; // state is now initilized but not visited
@@ -473,9 +478,7 @@ int nextOvershoot(int state, bool OvershootAP){
             if(!OvershootAP) {return 0;}
             if(OvershootAP) {return 1;}
         case 1:
-          #ifdef DIVINE        
             __vm_ctl_flag(0, _VM_CF_Error);
-          #endif            
             if (OvershootAP) {return 1;}
         default:
             return state;
@@ -484,9 +487,7 @@ int nextOvershoot(int state, bool OvershootAP){
 
 // Checks if the system reaches a bounded state, therfore, is stable but not necesseraly within settling time 
 int nextBounded(int state, bool BoundedAP){
-  #ifdef DIVINE
     __dios_trace_f("Bounded: %x", BoundedAP);
-  #endif
     switch(state) {
         case -1:
             return 1;
@@ -503,9 +504,7 @@ int nextBounded(int state, bool BoundedAP){
 
 // Checks if the system reaches a stable state within the settling time
 int nextSettlingTime(int state, bool StableAP){
-  #ifdef DIVINE
     __dios_trace_f("Settling Time: %x", StableAP);
-  #endif
     switch(state) {
       case -1:
           return 1;
@@ -583,7 +582,7 @@ int_T main(int_T argc, const char *argv[])
     /*
     * Initialize Observer thresholds: epsilon, overshoot, rise level, rise time and settling time
     */
-    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 27.0, 90.0, 0.07, 1.5);
+    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 28.0, 90.0, 0.07, 1.5);
   #ifdef DIVINE  
     /* 
      * Init states for model checking with Divine
@@ -656,6 +655,30 @@ int_T main(int_T argc, const char *argv[])
         __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
         __dios_trace_f( "state overshoot: %d -> %d", oldStateOvershoot, stateOvershoot );
         __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
+
+        /*
+            !!! Test !!!
+            Choose which property to test, multiple simulaniously testing is (probably) not possible
+        */
+        
+        enum Property { Rise, Settle, Overshoot, Bounded };
+        Property propertyToBeTested = Overshoot;
+
+        switch (propertyToBeTested)
+        {
+        case Rise:
+            __dios_trace_f( "state rise: %d -> %d", oldStateRise, stateRise );
+            break;
+        case Settle:
+            __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
+            break;
+        case Overshoot:
+            __dios_trace_f( "state overshoot: %d -> %d", oldStateOvershoot, stateOvershoot );
+            break;
+        case Bounded:
+             __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
+             break;
+        }
       #endif
     }
   
@@ -693,6 +716,6 @@ int_T main(int_T argc, const char *argv[])
     return ret;
 }
 
-/* [EOF] rt_cppclass_main.cpp */
+/* [EOF] main.cpp */
 
 
