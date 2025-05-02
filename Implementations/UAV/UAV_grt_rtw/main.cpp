@@ -453,15 +453,12 @@ int nextRise(int state, bool RiseAP){
     switch(state) {
         case -1:
             return 1;
-
         case 0:
             __vm_ctl_flag(0, _VM_CF_Accepting);
             if(RiseAP) {return 0;}
-
         case 1:
             if(RiseAP) {return 0;}
             if(!RiseAP) {return 1;}
-
         default:
             return state;
     }
@@ -582,7 +579,7 @@ int_T main(int_T argc, const char *argv[])
     /*
     * Initialize Observer thresholds: epsilon, overshoot, rise level, rise time and settling time
     */
-    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 28.0, 90.0, 0.07, 1.5);
+    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 27.0, 90.0, 0.7, 1.5);
   #ifdef DIVINE  
     /* 
      * Init states for model checking with Divine
@@ -645,43 +642,33 @@ int_T main(int_T argc, const char *argv[])
         rt_OneStep(MODEL_INSTANCE);
         
       #ifdef DIVINE
-        // Each Büchi automaton is updated 
-        stateRise = nextRise(stateRise, MODEL_INSTANCE.ObserverFSM.wasRiseVisited());
-        stateOvershoot = nextOvershoot(stateOvershoot, MODEL_INSTANCE.ObserverFSM.wasOvershootVisited());
-        stateBounded = nextBounded(stateBounded, MODEL_INSTANCE.ObserverFSM.wasBoundedVisited());
-        stateSettlingTime = nextSettlingTime(stateSettlingTime, MODEL_INSTANCE.ObserverFSM.wasRestVisited());
+        //Choose which property to test, multiple simulaniously testing is (probably) not possible
+        enum Property { Rise, Overshoot, Bounded, Settle };
+        Property propertyToBeTested = Rise;
 
-        __dios_trace_f( "state rise: %d -> %d", oldStateRise, stateRise );
-        __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
-        __dios_trace_f( "state overshoot: %d -> %d", oldStateOvershoot, stateOvershoot );
-        __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
-
-        /*
-            !!! Test !!!
-            Choose which property to test, multiple simulaniously testing is (probably) not possible
-        */
-        
-        enum Property { Rise, Settle, Overshoot, Bounded };
-        Property propertyToBeTested = Overshoot;
-
+        // Update corresponding büchi automaton and trace the change for the report
         switch (propertyToBeTested)
         {
         case Rise:
+            stateRise = nextRise(stateRise, MODEL_INSTANCE.ObserverFSM.wasRiseVisited());
             __dios_trace_f( "state rise: %d -> %d", oldStateRise, stateRise );
             break;
-        case Settle:
-            __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
-            break;
         case Overshoot:
+            stateOvershoot = nextOvershoot(stateOvershoot, MODEL_INSTANCE.ObserverFSM.wasOvershootVisited());
             __dios_trace_f( "state overshoot: %d -> %d", oldStateOvershoot, stateOvershoot );
             break;
         case Bounded:
-             __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
-             break;
-        }
+            stateBounded = nextBounded(stateBounded, MODEL_INSTANCE.ObserverFSM.wasBoundedVisited());
+            __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
+            break;
+        case Settle:
+            stateSettlingTime = nextSettlingTime(stateSettlingTime, MODEL_INSTANCE.ObserverFSM.wasRestVisited());
+            __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
+            break;
+        } 
       #endif
     }
-  
+
   #ifdef OBSERVER_TEST
     std::cout << "States: [Rest, Transient, Rise, Overshoot, Bounded]\nVisited: [ ";
     std::vector<bool> visitedStates = MODEL_INSTANCE.ObserverFSM.visitedStates();
