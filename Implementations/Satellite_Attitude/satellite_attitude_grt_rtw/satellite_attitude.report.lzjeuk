@@ -1,0 +1,308 @@
+states per second: 2211.54
+state count: 115
+mips: 0.747115
+
+version: 4.4.2
+architecture: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+memory used: 553584
+physical memory used: 264836
+user time: 2.722622
+system time: 0.342707
+wall time: 3.869182
+
+cycle timers (search):
+  smt-f: { mcycles: 0, hits: 0, kc-avg: 0 }
+  smt-eq: { mcycles: 0, hits: 0, kc-avg: 0 }
+  divm: { mcycles: 58, hits: 114, kc-avg: 511 }
+  hash: { mcycles: 4, hits: 115, kc-avg: 34 }
+input file: ../satellite_attitude.bc
+compile options:
+  - ../satellite_attitude.bc
+input options:
+  sys.0: "nofail:malloc"
+  divine.bcname: "../satellite_attitude.bc"
+dios config: fair
+lamp config: ""
+static reduction: 1
+property type: liveness
+
+timers:
+  lart: 1.05
+  loader: 1.42
+  boot: 0.15
+  search: 0.052
+  ce: 0.204
+cycle timers (ce):
+  smt-f: { mcycles: 0, hits: 0, kc-avg: 0 }
+  smt-eq: { mcycles: 0, hits: 0, kc-avg: 0 }
+  divm: { mcycles: 81, hits: 115, kc-avg: 710 }
+  hash: { mcycles: 17, hits: 114, kc-avg: 152 }
+
+error found: yes
+error trace: |
+  [0] 
+** starting the model **
+  FAULT: division by [f64 0 100'd']
+  [0] FATAL: floating-point arithmetic error in userspace
+
+machine trace:
+  - choices: 0/1
+    interrupts: C/11362/666:37
+  - choices: 0/1
+    interrupts: C/115/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/134/668:20
+  - choices: 0/1
+    interrupts: C/110/668:47
+  - choices: 0/1
+    interrupts: C/98/668:47
+  - choices: 0/1
+    interrupts: C/499/669:24
+  - choices: 0/1
+    interrupts: C/92/669:24
+  - choices: 0/1
+    interrupts: C/236/669:24
+  - choices: 0/1
+    interrupts: C/132/666:37
+  - choices: 0/1
+    interrupts: C/102/666:37
+  - choices: 0/1
+    interrupts: C/100/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/2357/666:37
+  - choices: 0/1
+    interrupts: C/115/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/88/666:81
+  - choices: 0/1
+    interrupts: C/134/668:20
+  - choices: 0/1
+    interrupts: C/110/668:47
+  - choices: 0/1
+    interrupts: C/98/668:47
+  - choices: 0/1
+    interrupts: C/883/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: C/84/939:45
+  - choices: 0/1
+    interrupts: ""
+
+active stack:
+  - symbol: void __dios::FaultBase::handler<__dios::Context>(_VM_Fault, _VM_Frame*, void (*)())
+    location: /dios/sys/fault.hpp:119
+    pc: code* 804b7 4
+    address: alloca* 100010 0+0
+
+  - symbol: Observer::setExternalInput(double, double, double, double)
+    location: /mnt/c/Users/sebas/Dokumenty/GitHub/CT-Verification/Implementations/Satellite_Attitude/satellite_attitude_grt_rtw/Observer.cpp:54
+    pc: code* 80039 17h
+    address: heap* 5e07730e 0+0
+
+  - symbol: satellite_attitude::step()
+    location: /mnt/c/Users/sebas/Dokumenty/GitHub/CT-Verification/Implementations/Satellite_Attitude/satellite_attitude_grt_rtw/satellite_attitude.cpp:187
+    pc: code* 8002c 107h
+    address: heap* 9ebf0f23 0+0
+
+  - symbol: rt_OneStep(satellite_attitude&)
+    location: ./main.cpp:212
+    pc: code* 80004 24h
+    address: heap* 31d6f5d4 0+0
+
+  - symbol: main
+    location: ./main.cpp:646
+    pc: code* 80002 2b
+    address: heap* 1f4b84d0 0+0
+
+  - symbol: __dios_start
+    location: /dios/libc/sys/start.cpp:94
+    pc: code* 803b5 25h
+    address: heap* d48cf3ae 0+0
+

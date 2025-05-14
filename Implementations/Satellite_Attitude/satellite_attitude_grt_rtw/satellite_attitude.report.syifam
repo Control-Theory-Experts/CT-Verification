@@ -1,0 +1,41 @@
+states per second: 3519.45
+state count: 1538
+mips: 1.92057
+
+version: 4.4.2
+architecture: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+memory used: 708632
+physical memory used: 427816
+user time: 9.890844
+system time: 0.565474
+wall time: 11.639616
+
+cycle timers (search):
+  smt-f: { mcycles: 0, hits: 0, kc-avg: 0 }
+  smt-eq: { mcycles: 0, hits: 0, kc-avg: 0 }
+  divm: { mcycles: 683, hits: 2921, kc-avg: 233 }
+  hash: { mcycles: 136, hits: 2920, kc-avg: 46 }
+input file: ../satellite_attitude.bc
+compile options:
+  - ../satellite_attitude.bc
+input options:
+  sys.0: "nofail:malloc"
+  divine.bcname: "../satellite_attitude.bc"
+dios config: fair
+lamp config: ""
+static reduction: 1
+property type: liveness
+
+timers:
+  lart: 1.96
+  loader: 6.92
+  boot: 0.155
+  search: 0.437
+  ce: 0.1
+cycle timers (ce):
+  smt-f: { mcycles: 0, hits: 0, kc-avg: 0 }
+  smt-eq: { mcycles: 0, hits: 0, kc-avg: 0 }
+  divm: { mcycles: 0, hits: 0, kc-avg: 0 }
+  hash: { mcycles: 0, hits: 0, kc-avg: 0 }
+
+error found: no

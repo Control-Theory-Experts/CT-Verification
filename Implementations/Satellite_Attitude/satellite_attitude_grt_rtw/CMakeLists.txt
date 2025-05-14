@@ -27,7 +27,7 @@ get_filename_component(START_DIR .. ABSOLUTE)
 # by setting the variable from the command line, e.g.,
 # 
 # 	cmake . -DMATLAB_ROOT=/path/to/another/matlab/root
-set(MATLAB_ROOT /mnt/c/Program\ Files/MATLAB/R2024b CACHE PATH "")
+set(MATLAB_ROOT C:/Program\ Files/MATLAB/R2024b CACHE PATH "")
 
 ###########################################################################
 ## System Libraries

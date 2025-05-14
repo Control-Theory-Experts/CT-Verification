@@ -7,9 +7,9 @@
  *
  * Code generation for model "satellite_attitude".
  *
- * Model version              : 1.13
+ * Model version              : 1.14
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Tue Apr  1 15:44:16 2025
+ * C++ source code generated on : Tue Apr 15 17:31:50 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -169,6 +169,24 @@ void satellite_attitude::step()
 
   /* TransferFcn: '<Root>/Amplifier' */
   satellite_attitude_B.amplifiedSignal = 2400.0 * satellite_attitude_X.Amplifier;
+
+
+/* Is this the time information? If so jackpott 
+    * Could be passed to the Observer and can serve as guards */
+    time_T timing = rtsiGetT(&(&satellite_attitude_M)->solverInfo);
+    
+    /* 
+    *
+    * Pass values to the Observer
+    * The error of the system is captured by the variable:        rtb_e
+    * The reference is captrued by the variable:                  Velocity_Controlled_Vehicle_B.ref
+    * The output of the system is captured by the variable:       (Velocity_Controlled_Vehicle_P.car_transfer_fcn_C[0] * Velocity_Controlled_Vehicle_X.car_transfer_fcn_CSTATE[0] + Velocity_Controlled_Vehicle_P.car_transfer_fcn_C[1] * Velocity_Controlled_Vehicle_X.car_transfer_fcn_CSTATE[1])
+    * 
+    */
+
+    ObserverFSM.setExternalInput(satellite_attitude_U.desiredAttitude, rtb_errorDesiredActualAttitude, satellite_attitude_Y.ActualAttitude, timing);
+    ObserverFSM.transition();
+
   if (rtmIsMajorTimeStep((&satellite_attitude_M))) {
     /* Matfile logging */
     rt_UpdateTXYLogVars((&satellite_attitude_M)->rtwLogInfo,
@@ -451,7 +469,8 @@ satellite_attitude::satellite_attitude() :
   satellite_attitude_B(),
   satellite_attitude_X(),
   satellite_attitude_XDis(),
-  satellite_attitude_M()
+  satellite_attitude_M(),
+  ObserverFSM()
 {
   /* Currently there is no constructor body generated.*/
 }
