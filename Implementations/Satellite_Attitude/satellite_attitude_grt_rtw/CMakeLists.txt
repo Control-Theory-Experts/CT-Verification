@@ -27,7 +27,7 @@ get_filename_component(START_DIR .. ABSOLUTE)
 # by setting the variable from the command line, e.g.,
 # 
 # 	cmake . -DMATLAB_ROOT=/path/to/another/matlab/root
-set(MATLAB_ROOT C:/Program\ Files/MATLAB/R2024b CACHE PATH "")
+set(MATLAB_ROOT "/mnt/c/Program Files/MATLAB/R2024b" CACHE PATH "")
 
 ###########################################################################
 ## System Libraries
@@ -58,9 +58,11 @@ set(SATELLITE_ATTITUDE_COMMON_DEFINES -DMODEL=satellite_attitude
     -DMT=0)
 
 # Definition of target "satellite_attitude_objects".
-add_library(satellite_attitude_objects OBJECT ${MATLAB_ROOT}/rtw/c/src/rt_logging.c
+add_library(satellite_attitude_objects OBJECT "/mnt/c/Program Files/MATLAB/R2024b/rtw/c/src/rt_logging.c"
     ${START_DIR}/satellite_attitude_grt_rtw/rt_nonfinite.cpp
-    ${START_DIR}/satellite_attitude_grt_rtw/satellite_attitude.cpp)
+    ${START_DIR}/satellite_attitude_grt_rtw/satellite_attitude.cpp
+    ${START_DIR}/satellite_attitude_grt_rtw/Observer.cpp
+    ${START_DIR}/satellite_attitude_grt_rtw/ConcreteObserverStates.cpp)
 
 # Set properties for target "satellite_attitude_objects".
 set_target_properties(satellite_attitude_objects PROPERTIES PREFIX ""
@@ -91,8 +93,8 @@ target_include_directories(satellite_attitude_objects PUBLIC $<BUILD_INTERFACE:$
 target_link_libraries(satellite_attitude_objects PUBLIC $<$<BOOL:${FOUND_LIBM}>:m>)
 
 
-# Definition of target "satellite_attitude".
-add_executable(satellite_attitude  ${MATLAB_ROOT}/rtw/c/src/common/rt_cppclass_main.cpp)
+# Definition of target "satellite_attitude". ${MATLAB_ROOT}/rtw/c/src/common/rt_cppclass_main.cpp
+add_executable(satellite_attitude  /mnt/c/Users/sebas/Dokumenty/GitHub/CT-Verification/Implementations/Satellite_Attitude/satellite_attitude_grt_rtw/main.cpp)
 
 # Set properties for target "satellite_attitude".
 set_target_properties(satellite_attitude PROPERTIES PREFIX ""

@@ -7,9 +7,9 @@
  *
  * Code generation for model "satellite_attitude".
  *
- * Model version              : 1.14
+ * Model version              : 1.18
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Tue Apr 15 17:31:50 2025
+ * C++ source code generated on : Thu May 15 17:20:05 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -169,6 +169,8 @@
 
 /* Block signals (default storage) */
 struct B_satellite_attitude_T {
+  real_T desiredAttitude;              /* '<Root>/Step' */
+  real_T actualAttitude;              /* '<Root>/Satellite structure (Plant)' */
   real_T FilterCoefficient;            /* '<S39>/Filter Coefficient' */
   real_T Sum;                          /* '<S45>/Sum' */
   real_T IntegralGain;                 /* '<S33>/Integral Gain' */
@@ -203,26 +205,16 @@ struct XDis_satellite_attitude_T {
   boolean_T Amplifier;                 /* '<Root>/Amplifier' */
 };
 
-#ifndef ODE4_INTG
-#define ODE4_INTG
+#ifndef ODE3_INTG
+#define ODE3_INTG
 
-/* ODE4 Integration Data */
-struct ODE4_IntgData {
+/* ODE3 Integration Data */
+struct ODE3_IntgData {
   real_T *y;                           /* output */
-  real_T *f[4];                        /* derivatives */
+  real_T *f[3];                        /* derivatives */
 };
 
 #endif
-
-/* External inputs (root inport signals with default storage) */
-struct ExtU_satellite_attitude_T {
-  real_T desiredAttitude;              /* '<Root>/DesiredAttitude' */
-};
-
-/* External outputs (root outports fed by signals with default storage) */
-struct ExtY_satellite_attitude_T {
-  real_T ActualAttitude;               /* '<Root>/ActualAttitude' */
-};
 
 /* Real-time Model Data Structure */
 struct tag_RTM_satellite_attitude_T {
@@ -238,8 +230,8 @@ struct tag_RTM_satellite_attitude_T {
   boolean_T derivCacheNeedsReset;
   boolean_T CTOutputIncnstWithState;
   real_T odeY[7];
-  real_T odeF[4][7];
-  ODE4_IntgData intgData;
+  real_T odeF[3][7];
+  ODE3_IntgData intgData;
 
   /*
    * Sizes:
@@ -262,12 +254,14 @@ struct tag_RTM_satellite_attitude_T {
     uint32_T clockTick0;
     uint32_T clockTickH0;
     time_T stepSize0;
+    uint32_T clockTick1;
+    uint32_T clockTickH1;
     time_T tStart;
     time_T tFinal;
     SimTimeStep simTimeStep;
     boolean_T stopRequestedFlag;
     time_T *t;
-    time_T tArray[1];
+    time_T tArray[2];
   } Timing;
 };
 
@@ -291,20 +285,8 @@ class satellite_attitude final
   /* Real-Time Model get method */
   RT_MODEL_satellite_attitude_T * getRTM();
 
-  Observer ObserverFSM;
-
-  /* Root inports set method */
-  void setExternalInputs(const ExtU_satellite_attitude_T
-    *pExtU_satellite_attitude_T)
-  {
-    satellite_attitude_U = *pExtU_satellite_attitude_T;
-  }
-
-  /* Root outports get method */
-  const ExtY_satellite_attitude_T &getExternalOutputs() const
-  {
-    return satellite_attitude_Y;
-  }
+  /* model start function */
+  void start();
 
   /* Initial conditions function */
   void initialize();
@@ -321,14 +303,10 @@ class satellite_attitude final
   /* Destructor */
   ~satellite_attitude();
 
+  Observer ObserverFSM;
+  
   /* private data and function members */
  private:
-  /* External inputs */
-  ExtU_satellite_attitude_T satellite_attitude_U;
-
-  /* External outputs */
-  ExtY_satellite_attitude_T satellite_attitude_Y;
-
   /* Block signals */
   B_satellite_attitude_T satellite_attitude_B;
 

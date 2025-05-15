@@ -7,9 +7,9 @@
  *
  * Code generation for model "satellite_attitude".
  *
- * Model version              : 1.14
+ * Model version              : 1.18
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Tue Apr 15 17:31:50 2025
+ * C++ source code generated on : Thu May 15 17:20:05 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping

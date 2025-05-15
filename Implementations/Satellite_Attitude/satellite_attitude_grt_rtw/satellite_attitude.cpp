@@ -7,9 +7,9 @@
  *
  * Code generation for model "satellite_attitude".
  *
- * Model version              : 1.14
+ * Model version              : 1.18
  * Simulink Coder version : 24.2 (R2024b) 21-Jun-2024
- * C++ source code generated on : Tue Apr 15 17:31:50 2025
+ * C++ source code generated on : Thu May 15 17:20:05 2025
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -23,11 +23,24 @@
 #include "satellite_attitude_private.h"
 
 /*
- * This function updates continuous states using the ODE4 fixed-step
+ * This function updates continuous states using the ODE3 fixed-step
  * solver algorithm
  */
 void satellite_attitude::rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
 {
+  /* Solver Matrices */
+  static const real_T rt_ODE3_A[3]{
+    1.0/2.0, 3.0/4.0, 1.0
+  };
+
+  static const real_T rt_ODE3_B[3][3]{
+    { 1.0/2.0, 0.0, 0.0 },
+
+    { 0.0, 3.0/4.0, 0.0 },
+
+    { 2.0/9.0, 1.0/3.0, 4.0/9.0 }
+  };
+
   time_T t { rtsiGetT(si) };
 
   time_T tnew { rtsiGetSolverStopTime(si) };
@@ -36,7 +49,7 @@ void satellite_attitude::rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
 
   real_T *x { rtsiGetContStates(si) };
 
-  ODE4_IntgData *id { static_cast<ODE4_IntgData *>(rtsiGetSolverData(si)) };
+  ODE3_IntgData *id { static_cast<ODE3_IntgData *>(rtsiGetSolverData(si)) };
 
   real_T *y { id->y };
 
@@ -46,9 +59,7 @@ void satellite_attitude::rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
 
   real_T *f2 { id->f[2] };
 
-  real_T *f3 { id->f[3] };
-
-  real_T temp;
+  real_T hB[3];
   int_T i;
   int_T nXc { 7 };
 
@@ -63,43 +74,42 @@ void satellite_attitude::rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
   rtsiSetdX(si, f0);
   satellite_attitude_derivatives();
 
-  /* f1 = f(t + (h/2), y + (h/2)*f0) */
-  temp = 0.5 * h;
+  /* f(:,2) = feval(odefile, t + hA(1), y + f*hB(:,1), args(:)(*)); */
+  hB[0] = h * rt_ODE3_B[0][0];
   for (i = 0; i < nXc; i++) {
-    x[i] = y[i] + (temp*f0[i]);
+    x[i] = y[i] + (f0[i]*hB[0]);
   }
 
-  rtsiSetT(si, t + temp);
+  rtsiSetT(si, t + h*rt_ODE3_A[0]);
   rtsiSetdX(si, f1);
   this->step();
   satellite_attitude_derivatives();
 
-  /* f2 = f(t + (h/2), y + (h/2)*f1) */
-  for (i = 0; i < nXc; i++) {
-    x[i] = y[i] + (temp*f1[i]);
+  /* f(:,3) = feval(odefile, t + hA(2), y + f*hB(:,2), args(:)(*)); */
+  for (i = 0; i <= 1; i++) {
+    hB[i] = h * rt_ODE3_B[1][i];
   }
 
+  for (i = 0; i < nXc; i++) {
+    x[i] = y[i] + (f0[i]*hB[0] + f1[i]*hB[1]);
+  }
+
+  rtsiSetT(si, t + h*rt_ODE3_A[1]);
   rtsiSetdX(si, f2);
   this->step();
   satellite_attitude_derivatives();
 
-  /* f3 = f(t + h, y + h*f2) */
+  /* tnew = t + hA(3);
+     ynew = y + f*hB(:,3); */
+  for (i = 0; i <= 2; i++) {
+    hB[i] = h * rt_ODE3_B[2][i];
+  }
+
   for (i = 0; i < nXc; i++) {
-    x[i] = y[i] + (h*f2[i]);
+    x[i] = y[i] + (f0[i]*hB[0] + f1[i]*hB[1] + f2[i]*hB[2]);
   }
 
   rtsiSetT(si, tnew);
-  rtsiSetdX(si, f3);
-  this->step();
-  satellite_attitude_derivatives();
-
-  /* tnew = t + h
-     ynew = y + (h/6)*(f0 + 2*f1 + 2*f2 + 2*f3) */
-  temp = h / 6.0;
-  for (i = 0; i < nXc; i++) {
-    x[i] = y[i] + temp*(f0[i] + 2.0*f1[i] + 2.0*f2[i] + f3[i]);
-  }
-
   rtsiSetSimTimeStep(si,MAJOR_TIME_STEP);
 }
 
@@ -128,25 +138,22 @@ void satellite_attitude::step()
       ->solverInfo);
   }
 
-  /* TransferFcn: '<Root>/Actuator' */
-  satellite_attitude_B.actuatorForce = 78.3 * satellite_attitude_X.Actuator[0];
+  /* Step: '<Root>/Step' */
+  satellite_attitude_B.desiredAttitude = !((&satellite_attitude_M)->Timing.t[0] <
+    1.0);
 
   /* TransferFcn: '<Root>/Satellite structure (Plant)' */
-  rtb_errorDesiredActualAttitude = 0.0 *
-    satellite_attitude_X.Satellite_structure[0] + 1.25 *
+  satellite_attitude_B.actualAttitude = 0.0;
+  satellite_attitude_B.actualAttitude += 0.0 *
+    satellite_attitude_X.Satellite_structure[0];
+  satellite_attitude_B.actualAttitude += 1.25 *
     satellite_attitude_X.Satellite_structure[1];
+  if (rtmIsMajorTimeStep((&satellite_attitude_M))) {
+  }
 
-  /* TransferFcn: '<Root>/Actuator' */
-  satellite_attitude_B.actuatorForce += 0.0 * satellite_attitude_X.Actuator[1];
-
-  /* Outport: '<Root>/ActualAttitude' */
-  satellite_attitude_Y.ActualAttitude = rtb_errorDesiredActualAttitude;
-
-  /* Sum: '<Root>/Sum' incorporates:
-   *  Inport: '<Root>/DesiredAttitude'
-   */
-  rtb_errorDesiredActualAttitude = satellite_attitude_U.desiredAttitude -
-    rtb_errorDesiredActualAttitude;
+  /* Sum: '<Root>/Sum' */
+  rtb_errorDesiredActualAttitude = satellite_attitude_B.desiredAttitude -
+    satellite_attitude_B.actualAttitude;
 
   /* Gain: '<S39>/Filter Coefficient' incorporates:
    *  Gain: '<S29>/Derivative Gain'
@@ -160,22 +167,26 @@ void satellite_attitude::step()
    *  Gain: '<S41>/Proportional Gain'
    *  Integrator: '<S36>/Integrator'
    */
-  satellite_attitude_B.Sum = (9.0 * rtb_errorDesiredActualAttitude +
+  satellite_attitude_B.Sum = (20.55 * rtb_errorDesiredActualAttitude +
     satellite_attitude_X.Integrator_CSTATE) +
     satellite_attitude_B.FilterCoefficient;
 
   /* Gain: '<S33>/Integral Gain' */
   satellite_attitude_B.IntegralGain = 0.0564 * rtb_errorDesiredActualAttitude;
 
+  /* TransferFcn: '<Root>/Actuator' */
+  satellite_attitude_B.actuatorForce = 78.3 * satellite_attitude_X.Actuator[0];
+  satellite_attitude_B.actuatorForce += 0.0 * satellite_attitude_X.Actuator[1];
+
   /* TransferFcn: '<Root>/Amplifier' */
   satellite_attitude_B.amplifiedSignal = 2400.0 * satellite_attitude_X.Amplifier;
+  if (rtmIsMajorTimeStep((&satellite_attitude_M))) {
+    /* Matfile logging */
+    rt_UpdateTXYLogVars((&satellite_attitude_M)->rtwLogInfo,
+                        ((&satellite_attitude_M)->Timing.t));
+  }                                    /* end MajorTimeStep */
 
-
-/* Is this the time information? If so jackpott 
-    * Could be passed to the Observer and can serve as guards */
-    time_T timing = rtsiGetT(&(&satellite_attitude_M)->solverInfo);
-    
-    /* 
+  /* 
     *
     * Pass values to the Observer
     * The error of the system is captured by the variable:        rtb_e
@@ -184,22 +195,18 @@ void satellite_attitude::step()
     * 
     */
 
-    ObserverFSM.setExternalInput(satellite_attitude_U.desiredAttitude, rtb_errorDesiredActualAttitude, satellite_attitude_Y.ActualAttitude, timing);
+    ObserverFSM.setExternalInput(satellite_attitude_B.desiredAttitude, rtb_errorDesiredActualAttitude, satellite_attitude_B.actualAttitude, (&satellite_attitude_M)->Timing.t[0]);
     ObserverFSM.transition();
-
-  if (rtmIsMajorTimeStep((&satellite_attitude_M))) {
-    /* Matfile logging */
-    rt_UpdateTXYLogVars((&satellite_attitude_M)->rtwLogInfo,
-                        ((&satellite_attitude_M)->Timing.t));
-  }                                    /* end MajorTimeStep */
 
   if (rtmIsMajorTimeStep((&satellite_attitude_M))) {
     /* signal main to stop simulation */
     {                                  /* Sample time: [0.0s, 0.0s] */
       if ((rtmGetTFinal((&satellite_attitude_M))!=-1) &&
-          !((rtmGetTFinal((&satellite_attitude_M))-(&satellite_attitude_M)
-             ->Timing.t[0]) > (&satellite_attitude_M)->Timing.t[0] *
-            (DBL_EPSILON))) {
+          !((rtmGetTFinal((&satellite_attitude_M))-((((&satellite_attitude_M)
+               ->Timing.clockTick1+(&satellite_attitude_M)->Timing.clockTickH1*
+               4294967296.0)) * 0.001)) > ((((&satellite_attitude_M)
+              ->Timing.clockTick1+(&satellite_attitude_M)->Timing.clockTickH1*
+              4294967296.0)) * 0.001) * (DBL_EPSILON))) {
         rtmSetErrorStatus((&satellite_attitude_M), "Simulation finished");
       }
     }
@@ -221,6 +228,22 @@ void satellite_attitude::step()
 
     (&satellite_attitude_M)->Timing.t[0] = rtsiGetSolverStopTime
       (&(&satellite_attitude_M)->solverInfo);
+
+    {
+      /* Update absolute timer for sample time: [0.001s, 0.0s] */
+      /* The "clockTick1" counts the number of times the code of this task has
+       * been executed. The resolution of this integer timer is 0.001, which is the step size
+       * of the task. Size of "clockTick1" ensures timer will not overflow during the
+       * application lifespan selected.
+       * Timer of this task consists of two 32 bit unsigned integers.
+       * The two integers represent the low bits Timing.clockTick1 and the high bits
+       * Timing.clockTickH1. When the low bit overflows to 0, the high bits increment.
+       */
+      (&satellite_attitude_M)->Timing.clockTick1++;
+      if (!(&satellite_attitude_M)->Timing.clockTick1) {
+        (&satellite_attitude_M)->Timing.clockTickH1++;
+      }
+    }
   }                                    /* end MajorTimeStep */
 }
 
@@ -303,7 +326,6 @@ void satellite_attitude::initialize()
   (&satellite_attitude_M)->intgData.f[0] = (&satellite_attitude_M)->odeF[0];
   (&satellite_attitude_M)->intgData.f[1] = (&satellite_attitude_M)->odeF[1];
   (&satellite_attitude_M)->intgData.f[2] = (&satellite_attitude_M)->odeF[2];
-  (&satellite_attitude_M)->intgData.f[3] = (&satellite_attitude_M)->odeF[3];
   (&satellite_attitude_M)->contStates = ((X_satellite_attitude_T *)
     &satellite_attitude_X);
   (&satellite_attitude_M)->contStateDisabled = ((XDis_satellite_attitude_T *)
@@ -311,10 +333,10 @@ void satellite_attitude::initialize()
   (&satellite_attitude_M)->Timing.tStart = (0.0);
   rtsiSetSolverData(&(&satellite_attitude_M)->solverInfo, static_cast<void *>(&(
     &satellite_attitude_M)->intgData));
-  rtsiSetSolverName(&(&satellite_attitude_M)->solverInfo,"ode4");
+  rtsiSetSolverName(&(&satellite_attitude_M)->solverInfo,"ode3");
   rtmSetTPtr((&satellite_attitude_M), &(&satellite_attitude_M)->Timing.tArray[0]);
-  rtmSetTFinal((&satellite_attitude_M), 10.0);
-  (&satellite_attitude_M)->Timing.stepSize0 = 0.2;
+  rtmSetTFinal((&satellite_attitude_M), 15.0);
+  (&satellite_attitude_M)->Timing.stepSize0 = 0.001;
 
   /* Setup for data logging */
   {
@@ -334,99 +356,9 @@ void satellite_attitude::initialize()
     rtliSetLogFormat((&satellite_attitude_M)->rtwLogInfo, 0);
     rtliSetLogMaxRows((&satellite_attitude_M)->rtwLogInfo, 0);
     rtliSetLogDecimation((&satellite_attitude_M)->rtwLogInfo, 1);
-
-    /*
-     * Set pointers to the data and signal info for each output
-     */
-    {
-      static void * rt_LoggedOutputSignalPtrs[1];
-      rt_LoggedOutputSignalPtrs[0] = &satellite_attitude_Y.ActualAttitude;
-      rtliSetLogYSignalPtrs((&satellite_attitude_M)->rtwLogInfo,
-                            ((LogSignalPtrsType)rt_LoggedOutputSignalPtrs));
-    }
-
-    {
-      static int_T rt_LoggedOutputWidths[] {
-        1
-      };
-
-      static int_T rt_LoggedOutputNumDimensions[] {
-        1
-      };
-
-      static int_T rt_LoggedOutputDimensions[] {
-        1
-      };
-
-      static boolean_T rt_LoggedOutputIsVarDims[] {
-        0
-      };
-
-      static void* rt_LoggedCurrentSignalDimensions[] {
-        (nullptr)
-      };
-
-      static int_T rt_LoggedCurrentSignalDimensionsSize[] {
-        4
-      };
-
-      static BuiltInDTypeId rt_LoggedOutputDataTypeIds[] {
-        SS_DOUBLE
-      };
-
-      static int_T rt_LoggedOutputComplexSignals[] {
-        0
-      };
-
-      static RTWPreprocessingFcnPtr rt_LoggingPreprocessingFcnPtrs[] {
-        (nullptr)
-      };
-
-      static const char_T *rt_LoggedOutputLabels[]{
-        "actualAttitude" };
-
-      static const char_T *rt_LoggedOutputBlockNames[]{
-        "satellite_attitude/ActualAttitude" };
-
-      static RTWLogDataTypeConvert rt_RTWLogDataTypeConvert[] {
-        { 0, SS_DOUBLE, SS_DOUBLE, 0, 0, 0, 1.0, 0, 0.0 }
-      };
-
-      static RTWLogSignalInfo rt_LoggedOutputSignalInfo[] {
-        {
-          1,
-          rt_LoggedOutputWidths,
-          rt_LoggedOutputNumDimensions,
-          rt_LoggedOutputDimensions,
-          rt_LoggedOutputIsVarDims,
-          rt_LoggedCurrentSignalDimensions,
-          rt_LoggedCurrentSignalDimensionsSize,
-          rt_LoggedOutputDataTypeIds,
-          rt_LoggedOutputComplexSignals,
-          (nullptr),
-          rt_LoggingPreprocessingFcnPtrs,
-
-          { rt_LoggedOutputLabels },
-          (nullptr),
-          (nullptr),
-          (nullptr),
-
-          { rt_LoggedOutputBlockNames },
-
-          { (nullptr) },
-          (nullptr),
-          rt_RTWLogDataTypeConvert
-        }
-      };
-
-      rtliSetLogYSignalInfo((&satellite_attitude_M)->rtwLogInfo,
-                            rt_LoggedOutputSignalInfo);
-
-      /* set currSigDims field */
-      rt_LoggedCurrentSignalDimensions[0] = &rt_LoggedOutputWidths[0];
-    }
-
-    rtliSetLogY((&satellite_attitude_M)->rtwLogInfo, "yout");
+    rtliSetLogY((&satellite_attitude_M)->rtwLogInfo, "");
+    rtliSetLogYSignalInfo((&satellite_attitude_M)->rtwLogInfo, (nullptr));
+    rtliSetLogYSignalPtrs((&satellite_attitude_M)->rtwLogInfo, (nullptr));
   }
 
   /* Matfile logging */
@@ -464,8 +396,6 @@ void satellite_attitude::terminate()
 
 /* Constructor */
 satellite_attitude::satellite_attitude() :
-  satellite_attitude_U(),
-  satellite_attitude_Y(),
   satellite_attitude_B(),
   satellite_attitude_X(),
   satellite_attitude_XDis(),

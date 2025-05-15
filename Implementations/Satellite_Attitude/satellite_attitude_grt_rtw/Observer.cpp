@@ -10,6 +10,7 @@
 #include <vector>
 #include "Observer.h"
 #include "ConcreteObserverStates.h"
+#include <iostream>
 
 // Initialization
 Observer::Observer() {
@@ -55,6 +56,8 @@ void Observer::setExternalInput(double Input1, double Input2, double Input3, dou
     error = (Input1 != 0.0) ? fabs(Input2/Input1)*100 : Input2;
     sysOut = Input3;
     time = Input4;
+
+    std::cout << "Reference: " << Input1 << "Error: " << error << "Real value: " << Input3 << "Time: " << Input4 << std::endl;
 }
 
 /*

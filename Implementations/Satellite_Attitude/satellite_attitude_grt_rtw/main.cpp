@@ -80,7 +80,7 @@ meet your application requirements.
 # define OBSERVER_TEST
 
 // For DIVINE
-# define DIVINE
+//# define DIVINE
 
 #ifdef DIVINE
 #include <dios.h>
@@ -585,7 +585,7 @@ int_T main(int_T argc, const char *argv[])
     /*
     * Initialize Observer thresholds: epsilon, overshoot, rise level, rise time and settling time
     */
-    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 0.0000001, 90.0, 1.5, 2.0);
+    MODEL_INSTANCE.ObserverFSM.initialThreshold(0.000001, 40, 90.0, 1.5, 2.0);
   #ifdef DIVINE  
     /* 
      * Init states for model checking with Divine
