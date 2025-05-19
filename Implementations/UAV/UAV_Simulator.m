@@ -8,21 +8,27 @@ Ki = 2.480;
 Kd = 1.10844;
 
 %% Simulate
-simOut = sim('UAV');
+simOut = sim('UAV', 'ReturnWorkspaceOutputs', 'on');
 
 % Determine control system performance
-info = simOut.yout;
-
+ds = simOut.logsout;
+disp(class(ds))
+signal = ds.getElement(2);
+disp(class(signal))
+zeit = signal.Values.Time;
+disp(class(zeit))
+werte = signal.Values.Data;
+disp(class(werte))
 % Rise time
-riseTime = info(info(:, 2) >= final_angle, :);
-riseTime = riseTime(1,1) - angle_change_start_time;
+idx = find(werte > final_angle*0.9, 1, 'first');
+riseTime = zeit(idx) - angle_change_start_time;
 
 % Settling time
 settlingTime = NaN;
-for i = 1:size(info, 1)
-    if abs(info(i, 2) - final_angle) < (epsilon * final_angle)
+for i = 1:length(werte)
+    if abs(werte(i) - final_angle) < (epsilon * final_angle)
         if isnan(settlingTime)
-            settlingTime = info(i, 1);
+            settlingTime = zeit(i);
         end
     else
         settlingTime = NaN;
@@ -30,17 +36,33 @@ for i = 1:size(info, 1)
 end
 
 % Overshoot
-overshoot = (max(info(:, 2)) - final_angle) / final_angle;
+overshoot = (max(werte) - final_angle) / final_angle;
 
 % Steady state error
-steadyStateError = abs(info(end, 2) - final_angle) / final_angle;
+steadyStateError = abs(werte(end) - final_angle) / final_angle;
 
 %% Show results
-plot(simOut.yout(:, 2));
-annotation('textbox', [0.15, 0.7, 0.4, 0.2], 'String', ...
+
+signal2 = ds.getElement(1);
+setpoints = signal2.Values.Data
+
+h1 = plot(zeit, setpoints, 'r-', 'LineWidth', 2);
+hold on
+h2 = plot(zeit, werte, 'b-','LineWidth', 2);
+hold off
+
+xlabel('Time [s]', 'FontSize', 14)
+ylabel('Pitch Orientation', 'FontSize', 14)
+legend([h2 h1],'controlled value', 'set-point value')
+grid on
+
+xlim([0 4])
+ax = gca;               % aktuelles Achsenobjekt
+ax.FontSize = 14; 
+annotation('textbox', [0.36, 0.3, 0.4, 0.2], 'String', ...
     { ...
         ['Rise Time: ' num2str(riseTime) 's'], ...
         ['Settling Time: ' num2str(settlingTime) 's'], ...
         ['Maximum Overshoot: ' num2str(overshoot*100) '%'], ...
         ['Steady State Error: ' num2str(steadyStateError*100) '%']
-    }, 'FontSize', 8, 'FitBoxToText', 'on');
+    }, 'FontSize', 14, 'FitBoxToText', 'on');

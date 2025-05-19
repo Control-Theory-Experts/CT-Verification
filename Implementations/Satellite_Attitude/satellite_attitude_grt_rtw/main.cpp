@@ -77,10 +77,10 @@ meet your application requirements.
 #include "Observer.h"
 #include <vector>
 
-# define OBSERVER_TEST
+//# define OBSERVER_TEST
 
 // For DIVINE
-//# define DIVINE
+# define DIVINE
 
 #ifdef DIVINE
 #include <dios.h>
@@ -585,7 +585,7 @@ int_T main(int_T argc, const char *argv[])
     /*
     * Initialize Observer thresholds: epsilon, overshoot, rise level, rise time and settling time
     */
-    MODEL_INSTANCE.ObserverFSM.initialThreshold(0.000001, 40, 90.0, 1.5, 2.0);
+    MODEL_INSTANCE.ObserverFSM.initialThreshold(0.1, 5, 90.0, 1.5, 2.0);
   #ifdef DIVINE  
     /* 
      * Init states for model checking with Divine
@@ -648,16 +648,30 @@ int_T main(int_T argc, const char *argv[])
         rt_OneStep(MODEL_INSTANCE);
         
       #ifdef DIVINE
-        // Each Büchi automaton is updated 
-        stateRise = nextRise(stateRise, MODEL_INSTANCE.ObserverFSM.wasRiseVisited());
-        stateOvershoot = nextOvershoot(stateOvershoot, MODEL_INSTANCE.ObserverFSM.wasOvershootVisited());
-        stateBounded = nextBounded(stateBounded, MODEL_INSTANCE.ObserverFSM.wasBoundedVisited());
-        stateSettlingTime = nextSettlingTime(stateSettlingTime, MODEL_INSTANCE.ObserverFSM.wasRestVisited());
+        //Choose which property to test, multiple simulaniously testing is (probably) not possible
+        enum Property { Rise, Overshoot, Bounded, Settle };
+        Property propertyToBeTested = Settle;
 
-        __dios_trace_f( "state rise: %d -> %d", oldStateRise, stateRise );
-        __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
-        __dios_trace_f( "state overshoot: %d -> %d", oldStateOvershoot, stateOvershoot );
-        __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
+        // Update corresponding büchi automaton and trace the change for the report
+        switch (propertyToBeTested)
+        {
+        case Rise:
+            stateRise = nextRise(stateRise, MODEL_INSTANCE.ObserverFSM.wasRiseVisited());
+            __dios_trace_f( "state rise: %d -> %d", oldStateRise, stateRise );
+            break;
+        case Overshoot:
+            stateOvershoot = nextOvershoot(stateOvershoot, MODEL_INSTANCE.ObserverFSM.wasOvershootVisited());
+            __dios_trace_f( "state overshoot: %d -> %d", oldStateOvershoot, stateOvershoot );
+            break;
+        case Bounded:
+            stateBounded = nextBounded(stateBounded, MODEL_INSTANCE.ObserverFSM.wasBoundedVisited());
+            __dios_trace_f( "state bounded: %d -> %d", oldStateBounded, stateBounded );
+            break;
+        case Settle:
+            stateSettlingTime = nextSettlingTime(stateSettlingTime, MODEL_INSTANCE.ObserverFSM.wasRestVisited());
+            __dios_trace_f( "state stable: %d -> %d", oldStateSettlingTime, stateSettlingTime );
+            break;
+        } 
       #endif
     }
   
