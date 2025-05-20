@@ -78,7 +78,9 @@ meet your application requirements.
 //# define OBSERVER_TEST
 
 // States if DIVINE model checker should be included
+#ifndef OBSERVER_TEST
 # define DIVINE
+#endif
 
 /*==========*
  * Includes *
@@ -89,10 +91,10 @@ meet your application requirements.
 
 // For DIVINE
 #ifdef DIVINE
-#include <dios.h>
-#include <sys/divm.h>
-#include <stdbool.h>
-#include <map>
+  #include <dios.h>
+  #include <sys/divm.h>
+  #include <stdbool.h>
+  #include <map>
 #endif
 
 #include "rtwtypes.h"
@@ -468,8 +470,8 @@ int nextRise(int state, bool RiseAP){
 int nextOvershoot(int state, bool OvershootAP){
     __dios_trace_f("Overshoot; %x", OvershootAP);
     switch (state) {
-        case -1: // initial state
-            return 0; // state is now initilized but not visited
+        case -1:
+            return 0;
         case 0:
             __vm_ctl_flag(0, _VM_CF_Accepting);
             if(!OvershootAP) {return 0;}
