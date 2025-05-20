@@ -8,27 +8,23 @@ Ki = 2.480;
 Kd = 1.10844;
 
 %% Simulate
-simOut = sim('UAV', 'ReturnWorkspaceOutputs', 'on');
+simOut = sim('UAV');
 
 % Determine control system performance
-ds = simOut.logsout;
-disp(class(ds))
-signal = ds.getElement(2);
-disp(class(signal))
-zeit = signal.Values.Time;
-disp(class(zeit))
-werte = signal.Values.Data;
-disp(class(werte))
+%%
+time = simOut.yout.getElement('Reference').Values.Time;
+reference = simOut.yout.getElement('Reference').Values.Data;
+output = simOut.yout.getElement('Output').Values.Data;
+
 % Rise time
-idx = find(werte > final_angle*0.9, 1, 'first');
-riseTime = zeit(idx) - angle_change_start_time;
+riseTime = time(find(output >= final_angle, 1)) - angle_change_start_time;
 
 % Settling time
 settlingTime = NaN;
-for i = 1:length(werte)
-    if abs(werte(i) - final_angle) < (epsilon * final_angle)
+for i = 1:length(time)
+    if abs(output(i) - final_angle) < (epsilon * final_angle)
         if isnan(settlingTime)
-            settlingTime = zeit(i);
+            settlingTime = time(i);
         end
     else
         settlingTime = NaN;
@@ -36,33 +32,62 @@ for i = 1:length(werte)
 end
 
 % Overshoot
-overshoot = (max(werte) - final_angle) / final_angle;
+overshoot = (max(output) - final_angle) / final_angle;
 
 % Steady state error
-steadyStateError = abs(werte(end) - final_angle) / final_angle;
+steadyStateError = abs(output(end) - final_angle) / final_angle;
 
 %% Show results
+xLimits = xlim;
+yLimits = ylim;
 
-signal2 = ds.getElement(1);
-setpoints = signal2.Values.Data
+xRange = xLimits(2)-xLimits(1);
+yPatch = [yLimits(1) yLimits(2) yLimits(2) yLimits(1)];
 
-h1 = plot(zeit, setpoints, 'r-', 'LineWidth', 2);
+% Divide x-axis into stripes
+xLines = [0.5 0.03 0.02 0.04 0.025 0.02 0.06 0.15];
+xPoints = zeros(1, length(xLines) + 2);
+xPoints(1) = xLimits(1);
+for i = 2:length(xLines)+1
+    xPoints(i) = xPoints(i-1) + xRange * xLines(i-1);
+end
+xPoints(end) = xLimits(2);
+
+colors = [
+    [0.8 1 0.8];  % light green (rest)
+    [1 0.9 0.7];  % light orange (transient)
+    [0.8 0.9 1];    % light blue (rise)
+    [1, 0.8, 0.8]  % light red (overshoot)
+    [1 0.9 0.7];  % light orange (transient)
+    [0.85 0.8 1];  % light purple (bounded)
+    [1 0.9 0.7];  % light orange (transient)
+    [0.85 0.8 1];  % light purple (bounded)
+    [0.8 1 0.8];  % light green (rest)
+];
+
+patches = zeros(1, length(xPoints)-1);
+
 hold on
-h2 = plot(zeit, werte, 'b-','LineWidth', 2);
-hold off
+for i = 1:length(xPoints)-1
+    patches(i) = patch([xPoints(i) xPoints(i) xPoints(i+1) xPoints(i+1)], ...
+          yPatch, colors(i,:), 'EdgeColor', 'none');
+end
 
+reference_plot = plot(time, reference, 'r-', 'LineWidth', 2);
+output_plot = plot(time, output, 'b-','LineWidth', 2);
+
+legend([patches(1) patches(2) patches(3) patches(4) patches(6) reference_plot output_plot], ...
+        {'Rest', 'Transient', 'Rise', 'Overshoot', 'Bounded', 'Set-point value', 'Controlled value'}, ...
+        'Location', 'northwest');
 xlabel('Time [s]', 'FontSize', 14)
 ylabel('Pitch Orientation', 'FontSize', 14)
-legend([h2 h1],'controlled value', 'set-point value')
-grid on
+hold off
 
-xlim([0 4])
-ax = gca;               % aktuelles Achsenobjekt
-ax.FontSize = 14; 
-annotation('textbox', [0.36, 0.3, 0.4, 0.2], 'String', ...
+annotation('textbox', [0.14, 0.4, 0.4, 0.2], 'String', ...
     { ...
         ['Rise Time: ' num2str(riseTime) 's'], ...
         ['Settling Time: ' num2str(settlingTime) 's'], ...
         ['Maximum Overshoot: ' num2str(overshoot*100) '%'], ...
         ['Steady State Error: ' num2str(steadyStateError*100) '%']
-    }, 'FontSize', 14, 'FitBoxToText', 'on');
+    }, 'FontSize', 8, 'FitBoxToText', 'on', 'BackgroundColor', 'white');
+
