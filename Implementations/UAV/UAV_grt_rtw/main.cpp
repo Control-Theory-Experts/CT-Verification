@@ -581,7 +581,7 @@ int_T main(int_T argc, const char *argv[])
     /*
     * Initialize Observer thresholds: epsilon, overshoot, rise level, rise time and settling time
     */
-    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 27.0, 90.0, 0.7, 1.5);
+    MODEL_INSTANCE.ObserverFSM.initialThreshold(1.0, 28.0, 90.0, 0.7, 1.5);
   #ifdef DIVINE  
     /* 
      * Init states for model checking with Divine
@@ -646,7 +646,7 @@ int_T main(int_T argc, const char *argv[])
       #ifdef DIVINE
         //Choose which property to test, multiple simulaniously testing is (probably) not possible
         enum Property { Rise, Overshoot, Bounded, Settle };
-        Property propertyToBeTested = Rise;
+        Property propertyToBeTested = Overshoot;
 
         // Update corresponding büchi automaton and trace the change for the report
         switch (propertyToBeTested)
